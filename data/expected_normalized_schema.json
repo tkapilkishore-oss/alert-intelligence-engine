@@ -1,0 +1,16 @@
+{
+  "alert_id": "string",
+  "source": "string",
+  "hazard_type": "flood | heatwave | cyclone | landslide | lightning | earthquake | other",
+  "severity": "Minor | Moderate | Severe | Extreme | Unknown",
+  "urgency": "Immediate | Expected | Future | Past | Unknown",
+  "certainty": "Observed | Likely | Possible | Unknown",
+  "location_name": "string",
+  "location_id": "string or null",
+  "start_time": "ISO-8601 datetime or null",
+  "end_time": "ISO-8601 datetime or null",
+  "recommended_action": "string",
+  "source_format": "json | cap_xml | rss | plaintext",
+  "is_duplicate": "boolean",
+  "parse_warnings": "list of strings"
+}

@@ -1,0 +1,559 @@
+# Implementation Plan
+
+**Project Name:** Alert Intelligence Engine – Disaster Alert Parser & Normalizer
+
+**Version:** 1.0
+
+**Status:** Frozen
+
+**Author:** Kapil Kishore
+
+---
+
+# 1. Purpose
+
+This document defines the complete implementation roadmap for Version 1.0 of the Alert Intelligence Engine.
+
+The project will be developed incrementally using a stage-based approach.
+
+Each stage must be:
+
+- Implemented
+- Tested
+- Reviewed
+- Documented
+- Frozen
+
+Only after successfully completing a stage may development continue to the next stage.
+
+---
+
+# 2. Development Methodology
+
+The project follows an iterative engineering workflow.
+
+Each stage follows the same lifecycle:
+
+```
+Plan
+
+↓
+
+Implement
+
+↓
+
+Test
+
+↓
+
+Generate Stage Report
+
+↓
+
+Freeze Stage
+
+↓
+
+Git Commit
+
+↓
+
+Next Stage
+```
+
+No future-stage features should be implemented early.
+
+---
+
+# 3. Engineering Rules
+
+The following rules apply throughout development.
+
+### Rule 1
+
+Implement only the current stage.
+
+Never generate code for future stages.
+
+---
+
+### Rule 2
+
+Never modify unrelated files.
+
+If an existing file must be changed:
+
+- Explain why
+- List the affected files
+- Apply only the required modifications
+
+---
+
+### Rule 3
+
+Every stage must compile independently.
+
+---
+
+### Rule 4
+
+Every stage must be tested before continuing.
+
+---
+
+### Rule 5
+
+Every completed stage must generate a Stage Report.
+
+---
+
+### Rule 6
+
+No unnecessary abstractions.
+
+No placeholder code.
+
+No speculative future modules.
+
+---
+
+# 4. Stage Overview
+
+| Stage | Name | Status |
+|---------|------|--------|
+| Stage 0 | Documentation Freeze | Pending |
+| Stage 1 | Project Foundation | Pending |
+| Stage 2 | JSON Parser | Pending |
+| Stage 3 | CAP XML Parser | Pending |
+| Stage 4 | RSS Parser | Pending |
+| Stage 5 | Plaintext Parser | Pending |
+| Stage 6 | Gemini Fallback | Pending |
+| Stage 7 | Normalization Engine | Pending |
+| Stage 8 | Validation Engine | Pending |
+| Stage 9 | Deduplication Engine | Pending |
+| Stage 10 | Pipeline Integration | Pending |
+| Stage 11 | Testing | Pending |
+| Stage 12 | Documentation & Submission | Pending |
+
+---
+
+# Stage 0 — Documentation Freeze
+
+## Goal
+
+Freeze all project documentation before implementation.
+
+## Deliverables
+
+- PRD
+- TRD
+- Implementation Plan
+- Design Decisions
+- Stage Report Template
+
+## Completion Criteria
+
+All documents reviewed and frozen.
+
+---
+
+# Stage 1 — Project Foundation
+
+## Goal
+
+Create the project skeleton and core infrastructure.
+
+## Files to Create
+
+- Folder structure
+- requirements.txt
+- .env.example
+- pipeline.py (skeleton)
+- base_parser.py
+- schema.py
+- logger.py
+
+## Expected Output
+
+Project initializes without errors.
+
+No parsing functionality yet.
+
+## Tests
+
+- Imports succeed
+- Project structure valid
+
+---
+
+# Stage 2 — JSON Parser
+
+## Goal
+
+Implement parsing for JSON alerts.
+
+## Files
+
+- json_parser.py
+
+## Features
+
+- Parse JSON
+- Produce ParsedAlert
+- Structural validation
+
+## Tests
+
+- Valid JSON
+- Missing fields
+- Malformed JSON
+
+## Completion Criteria
+
+JSON alerts successfully converted to ParsedAlert.
+
+---
+
+# Stage 3 — CAP XML Parser
+
+## Goal
+
+Implement CAP XML parsing.
+
+## Files
+
+- cap_parser.py
+
+## Features
+
+- Parse CAP XML
+- Produce ParsedAlert
+
+## Tests
+
+- Valid XML
+- Missing tags
+- Malformed XML
+
+---
+
+# Stage 4 — RSS Parser
+
+## Goal
+
+Implement RSS parsing.
+
+## Files
+
+- rss_parser.py
+
+## Features
+
+- Parse RSS
+- Produce ParsedAlert
+
+## Tests
+
+- Valid RSS
+- Missing elements
+- Malformed RSS
+
+---
+
+# Stage 5 — Plaintext Parser
+
+## Goal
+
+Implement deterministic plaintext parsing.
+
+## Files
+
+- plaintext_parser.py
+
+## Features
+
+- Regex extraction
+- ParsedAlert generation
+
+## Tests
+
+- Standard alert
+- Missing values
+- Different sentence formats
+
+---
+
+# Stage 6 — Gemini Fallback
+
+## Goal
+
+Enrich incomplete plaintext alerts using Gemini.
+
+## Files
+
+- gemini_extractor.py
+
+## Features
+
+- Detect missing required fields
+- Query Gemini
+- Merge missing fields only
+- Never overwrite deterministic parser output
+
+## Tests
+
+- Successful enrichment
+- API failure handling
+- Missing API key
+- Timeout handling
+
+## Completion Criteria
+
+Gemini is used only for incomplete plaintext alerts.
+
+---
+
+# Stage 7 — Normalization Engine
+
+## Goal
+
+Normalize all parsed alerts into the required schema.
+
+## Files
+
+- normalization.py
+- severity_mapper.py
+- urgency_mapper.py
+- certainty_mapper.py
+- location_mapper.py
+
+## Features
+
+- Severity normalization
+- Urgency normalization
+- Certainty normalization
+- Location mapping
+
+## Tests
+
+- Known mappings
+- Unknown values
+- Missing location
+
+---
+
+# Stage 8 — Validation Engine
+
+## Goal
+
+Validate parsed and normalized alerts.
+
+## Files
+
+- validator.py
+
+## Features
+
+### Structural Validation
+
+- Parser output validation
+
+### Schema Validation
+
+- Pydantic validation
+- Enum checks
+- Datatype checks
+- ISO datetime checks
+
+## Tests
+
+- Invalid enums
+- Invalid timestamps
+- Missing required fields
+
+---
+
+# Stage 9 — Deduplication Engine
+
+## Goal
+
+Identify duplicate alerts.
+
+## Files
+
+- deduplicator.py
+
+## Features
+
+Weighted duplicate scoring
+
+- Hazard match
+- Location match
+- Time overlap
+- Text similarity
+
+Threshold:
+
+0.75
+
+## Tests
+
+- Duplicate alerts
+- Unique alerts
+- Borderline cases
+
+---
+
+# Stage 10 — Pipeline Integration
+
+## Goal
+
+Connect all modules into one complete pipeline.
+
+## Features
+
+```
+Input
+
+↓
+
+Parser
+
+↓
+
+Validation
+
+↓
+
+Normalization
+
+↓
+
+Gemini
+
+↓
+
+Schema Validation
+
+↓
+
+Deduplication
+
+↓
+
+Output
+```
+
+## Output
+
+normalized_alerts.json
+
+## Tests
+
+Run complete pipeline on provided datasets.
+
+---
+
+# Stage 11 — Testing
+
+## Goal
+
+Verify complete system functionality.
+
+## Test Files
+
+- test_parsers.py
+- test_schema.py
+- test_mapping.py
+- test_deduplication.py
+- test_malformed.py
+
+## Success Criteria
+
+All tests pass.
+
+---
+
+# Stage 12 — Documentation & Submission
+
+## Goal
+
+Prepare final submission.
+
+## Deliverables
+
+- README.md
+- DESIGN_DECISIONS.md
+- SUMMARY.md
+- Architecture Diagram
+- Demo Video
+- normalized_alerts.json
+
+## Final Verification Checklist
+
+✓ All parsers working
+
+✓ Schema validated
+
+✓ Mappings applied
+
+✓ Gemini fallback functional
+
+✓ Deduplication functional
+
+✓ Parse warnings generated
+
+✓ Tests passing
+
+✓ Documentation complete
+
+---
+
+# 5. Stage Completion Checklist
+
+A stage is considered complete only if:
+
+- Feature implementation complete
+- Code reviewed
+- Tests passed
+- Stage Report generated
+- Git commit completed
+
+Only then may the next stage begin.
+
+---
+
+# 6. Risk Management
+
+Potential risks:
+
+- Parser failures
+- Malformed input
+- Gemini API failure
+- Incorrect mappings
+- Deduplication errors
+
+Mitigation:
+
+- Independent module testing
+- Graceful error handling
+- Stage-wise implementation
+- Continuous verification
+
+---
+
+# 7. Definition of Done
+
+The project is considered complete when:
+
+- All implementation stages are finished.
+- All tests pass.
+- normalized_alerts.json is generated correctly.
+- Documentation is finalized.
+- Submission package is ready.
+
+---
+
+End of Document
+

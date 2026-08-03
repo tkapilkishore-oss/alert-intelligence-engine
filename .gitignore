@@ -1,0 +1,24 @@
+# Environments & Virtual Envs
+.venv/
+env/
+venv/
+ENV/
+
+# Python Cache & Bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Testing & Coverage Cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# System Files & Secret Configs
+.DS_Store
+.env
+*.log
+
+# Engine Output Data
+outputs/

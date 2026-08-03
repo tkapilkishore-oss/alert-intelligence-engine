@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Demo Disaster Alert Feed</title>
+    
+    <item>
+      <title>RED ALERT: Urban Flood warning for Suryanagar Block 3</title>
+      <description>Urban Flood expected in Suryanagar Block 3. Action: Avoid low-lying roads and move valuables above ground level. Valid for next 48 hours.</description>
+      <pubDate>Thu, 17 Jul 2025 12:00:00 +0530</pubDate>
+      <guid>RSS-001</guid>
+    </item>
+    <item>
+      <title>RED ALERT: Urban Flood warning for Devapur Block 2</title>
+      <description>Urban Flood expected in Devapur Block 2. Action: Avoid low-lying roads and move valuables above ground level. Valid for next 48 hours.</description>
+      <pubDate>Thu, 17 Jul 2025 04:00:00 +0530</pubDate>
+      <guid>RSS-002</guid>
+    </item>
+    <item>
+      <title>Yellow: Lightning warning for Suryanagar Block 3</title>
+      <description>Lightning expected in Suryanagar Block 3. Action: Stay indoors and avoid open fields or isolated trees. Valid for next 12 hours.</description>
+      <pubDate>Tue, 15 Jul 2025 14:00:00 +0530</pubDate>
+      <guid>RSS-003</guid>
+    </item>
+    <item>
+      <title>Orange: Landslide warning for Suryanagar Block 2</title>
+      <description>Landslide expected in Suryanagar Block 2. Action: Avoid hill roads and report slope cracks to local authorities. Valid for next 12 hours.</description>
+      <pubDate>Fri, 18 Jul 2025 00:00:00 +0530</pubDate>
+      <guid>RSS-004</guid>
+    </item>
+    <item>
+      <title>Advisory: Lightning warning for Vanasthal Block 2</title>
+      <description>Lightning expected in Vanasthal Block 2. Action: Stay indoors and avoid open fields or isolated trees. Valid for next 6 hours.</description>
+      <pubDate>Thu, 17 Jul 2025 05:00:00 +0530</pubDate>
+      <guid>RSS-005</guid>
+    </item>
+    <item>
+      <title>Advisory: Heat Wave warning for Kalyanpur Block 3</title>
+      <description>Heat Wave expected in Kalyanpur Block 3. Action: Avoid outdoor work between 12:00 and 15:00; drink water frequently. Valid for next 48 hours.</description>
+      <pubDate>Fri, 18 Jul 2025 07:00:00 +0530</pubDate>
+      <guid>RSS-006</guid>
+    </item>
+    <item>
+      <title>RED ALERT: Heat Wave warning for Nirmala Block 3</title>
+      <description>Heat Wave expected in Nirmala Block 3. Action: Avoid outdoor work between 12:00 and 15:00; drink water frequently. Valid for next 12 hours.</description>
+      <pubDate>Fri, 18 Jul 2025 12:00:00 +0530</pubDate>
+      <guid>RSS-007</guid>
+    </item>
+    <item>
+      <title>Advisory: Landslide warning for Devapur Block 3</title>
+      <description>Landslide expected in Devapur Block 3. Action: Avoid hill roads and report slope cracks to local authorities. Valid for next 24 hours.</description>
+      <pubDate>Thu, 17 Jul 2025 03:00:00 +0530</pubDate>
+      <guid>RSS-008</guid>
+    </item>
+    <item>
+      <title>RED ALERT: Landslide warning for Kalyanpur Block 2</title>
+      <description>Landslide expected in Kalyanpur Block 2. Action: Avoid hill roads and report slope cracks to local authorities. Valid for next 48 hours.</description>
+      <pubDate>Tue, 15 Jul 2025 18:00:00 +0530</pubDate>
+      <guid>RSS-009</guid>
+    </item>
+    <item>
+      <title>Advisory: Urban Flood warning for Nirmala Block 1</title>
+      <description>Urban Flood expected in Nirmala Block 1. Action: Avoid low-lying roads and move valuables above ground level. Valid for next 48 hours.</description>
+      <pubDate>Sat, 19 Jul 2025 03:00:00 +0530</pubDate>
+      <guid>RSS-010</guid>
+    </item>
+  </channel>
+</rss>

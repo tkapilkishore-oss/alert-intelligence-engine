@@ -1,0 +1,9 @@
+ALERT PT-001 | Devapur | Severe flood warning | starts 2025-07-16 08:00 | avoid river-side roads
+PT-002 Suryanagar Block 2: HEATWAVE ORANGE advisory valid tomorrow afternoon. Set up water points.
+District Control: RED lightning alert for Vanasthal from 15 Jul 2025 18:00 to 15 Jul 2025 22:00. Stay indoors.
+PT-004 | Port Lakshmi | Cyclone Wind | HIGH | fishermen advised not to venture into sea
+Malformed alert: heavy rain maybe somewhere soon
+PT-006 Kalyanpur Block 1 landslide watch - hill road closure likely - valid 24 hours
+PT-007 Nirmala: Flood Watch. Low lying areas to monitor water levels.
+PT-008 Devapur Block 3: Severe heat stress. Schools advised to reduce outdoor activity.
+Duplicate PT-001 | Devapur | Severe flood warning | starts 2025-07-16 08:00 | avoid river-side roads

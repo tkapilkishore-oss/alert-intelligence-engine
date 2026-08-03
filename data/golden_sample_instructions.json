@@ -1,0 +1,50 @@
+[
+  {
+    "alert_id": "JSON-001",
+    "source_format": "json",
+    "required_fields_to_extract": [
+      "hazard_type",
+      "severity",
+      "location_name",
+      "start_time",
+      "end_time",
+      "recommended_action"
+    ]
+  },
+  {
+    "alert_id": "CAP-001",
+    "source_format": "cap_xml",
+    "required_fields_to_extract": [
+      "hazard_type",
+      "severity",
+      "urgency",
+      "certainty",
+      "location_name"
+    ]
+  },
+  {
+    "alert_id": "RSS-001",
+    "source_format": "rss",
+    "required_fields_to_extract": [
+      "hazard_type",
+      "severity",
+      "location_name",
+      "recommended_action"
+    ]
+  },
+  {
+    "alert_id": "PT-001",
+    "source_format": "plaintext",
+    "required_fields_to_extract": [
+      "hazard_type",
+      "severity",
+      "location_name",
+      "start_time"
+    ]
+  },
+  {
+    "alert_id": "Malformed alert",
+    "source_format": "plaintext",
+    "expected_behavior": "Return parse warning; do not hallucinate missing fields"
+  }
+]

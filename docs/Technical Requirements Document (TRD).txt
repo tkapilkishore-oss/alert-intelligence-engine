@@ -1,0 +1,647 @@
+# Technical Requirements Document (TRD)
+
+**Project Name:** Alert Intelligence Engine – Disaster Alert Parser & Normalizer
+
+**Version:** 1.0
+
+**Status:** Frozen
+
+**Author:** Kapil Kishore
+
+**Project Type:** AI/ML Engineering Assignment
+
+---
+
+# 1. Purpose
+
+## 1.1 Objective
+
+This document defines the complete technical architecture, implementation strategy, module responsibilities, processing pipeline, validation strategy, testing approach, and engineering principles for the Alert Intelligence Engine.
+
+The TRD serves as the single source of truth during implementation.
+
+All development should follow this document unless a deliberate design decision is documented and approved.
+
+---
+
+# 2. System Overview
+
+The Alert Intelligence Engine is a modular batch-processing pipeline that ingests disaster alerts from multiple heterogeneous formats, extracts structured information, normalizes the extracted data into a common schema, validates the normalized records, detects duplicate alerts, and exports a standardized JSON file.
+
+The system is intentionally designed as a processing engine rather than a web application.
+
+---
+
+# 3. System Architecture
+
+```
+                     Input Files
+                          │
+                          ▼
+                  Format Detection
+                          │
+                          ▼
+                   Parser Router
+                          │
+      ┌──────────┬──────────┬──────────┬──────────┐
+      ▼          ▼          ▼          ▼
+ JSONParser   CAPParser   RSSParser   PlaintextParser
+      │          │          │          │
+      └──────────┴──────────┴──────────┘
+                     │
+                     ▼
+               ParsedAlert
+                     │
+                     ▼
+          Structural Validation
+                     │
+                     ▼
+          Normalization Engine
+         ├── Severity Mapper
+         ├── Urgency Mapper
+         ├── Certainty Mapper
+         └── Location Mapper
+                     │
+                     ▼
+      Gemini Fallback (Plaintext Only)
+                     │
+                     ▼
+        Final Schema Validation
+                     │
+                     ▼
+      Batch Deduplication Engine
+                     │
+                     ▼
+          normalized_alerts.json
+```
+
+---
+
+# 4. Technical Stack
+
+## Programming Language
+
+- Python 3.11+
+
+## Core Libraries
+
+- Pydantic v2
+- pandas
+- lxml
+- feedparser
+- RapidFuzz
+- python-dotenv
+- logging
+- pytest
+
+## AI
+
+- Google Gemini API
+
+Gemini is used only as a fallback mechanism for incomplete plaintext extraction.
+
+---
+
+# 5. Project Structure
+
+```
+alert-intelligence-engine/
+
+├── data/
+│   └── provided/
+│
+├── docs/
+│
+├── outputs/
+│
+├── src/
+│
+│   ├── parsers/
+│   │   ├── base_parser.py
+│   │   ├── json_parser.py
+│   │   ├── cap_parser.py
+│   │   ├── rss_parser.py
+│   │   └── plaintext_parser.py
+│   │
+│   ├── pipeline.py
+│   ├── schema.py
+│   ├── validator.py
+│   ├── normalization.py
+│   ├── severity_mapper.py
+│   ├── urgency_mapper.py
+│   ├── certainty_mapper.py
+│   ├── location_mapper.py
+│   ├── deduplicator.py
+│   ├── gemini_extractor.py
+│   └── logger.py
+│
+├── tests/
+│
+├── requirements.txt
+│
+├── .env.example
+│
+└── README.md
+```
+
+---
+
+# 6. Core Data Models
+
+## 6.1 ParsedAlert
+
+Intermediate object produced by every parser.
+
+Purpose:
+
+- Hold raw extracted values
+- Remain independent of final schema
+- Allow shared normalization logic
+
+Typical fields:
+
+- raw hazard
+- raw severity
+- raw urgency
+- raw certainty
+- raw location
+- raw timestamps
+- raw action
+- source metadata
+
+No normalization is performed here.
+
+---
+
+## 6.2 NormalizedAlert
+
+Final object that exactly matches:
+
+expected_normalized_schema.json
+
+No extra fields are permitted.
+
+Every output record written to normalized_alerts.json must conform to this model.
+
+---
+
+# 7. Parser Architecture
+
+## BaseParser
+
+Abstract interface implemented by every parser.
+
+Responsibilities:
+
+- Accept raw input
+- Parse source-specific structure
+- Return ParsedAlert
+
+No normalization.
+
+No validation.
+
+No duplicate detection.
+
+---
+
+## JSON Parser
+
+Responsibilities:
+
+- Parse JSON
+- Extract raw fields
+
+Output:
+
+ParsedAlert
+
+---
+
+## CAP XML Parser
+
+Responsibilities:
+
+- Parse CAP XML
+- Extract raw fields
+
+Output:
+
+ParsedAlert
+
+---
+
+## RSS Parser
+
+Responsibilities:
+
+- Parse RSS XML
+- Extract raw fields
+
+Output:
+
+ParsedAlert
+
+---
+
+## Plaintext Parser
+
+Responsibilities:
+
+- Perform deterministic regex extraction
+- Return ParsedAlert
+
+Gemini is NOT called directly inside the parser.
+
+The parser only extracts what can be reliably identified.
+
+---
+
+# 8. Pipeline Design
+
+Processing sequence:
+
+```
+Input File
+
+↓
+
+Format Detection
+
+↓
+
+Parser Router
+
+↓
+
+Source Parser
+
+↓
+
+ParsedAlert
+
+↓
+
+Structural Validation
+
+↓
+
+Normalization Engine
+
+↓
+
+Gemini Fallback (Plaintext Only)
+
+↓
+
+Final Schema Validation
+
+↓
+
+Batch Deduplication
+
+↓
+
+normalized_alerts.json
+```
+
+The pipeline processes alerts individually until deduplication.
+
+Deduplication operates on the complete normalized batch.
+
+---
+
+# 9. Validation Strategy
+
+## Stage 1 — Structural Validation
+
+Purpose:
+
+Validate parser output before normalization.
+
+Checks:
+
+- Parser succeeded
+- Minimum usable fields exist
+- Record is structurally recoverable
+
+Malformed records are skipped with warnings.
+
+---
+
+## Stage 2 — Final Schema Validation
+
+Uses Pydantic.
+
+Checks:
+
+- Required fields
+- Enum values
+- Datatypes
+- ISO-8601 timestamps
+
+Only validated records proceed.
+
+---
+
+# 10. Normalization Engine
+
+The Normalization Engine is responsible for converting ParsedAlert into NormalizedAlert.
+
+Internally it consists of:
+
+## Severity Mapper
+
+Uses:
+
+severity_mapping_reference.csv
+
+Unknown values:
+
+Unknown
+
+Adds parse warning.
+
+---
+
+## Urgency Mapper
+
+Maps urgency values according to provided references.
+
+Unknown values become:
+
+Unknown
+
+---
+
+## Certainty Mapper
+
+Maps certainty values according to provided references.
+
+Unknown values become:
+
+Unknown
+
+---
+
+## Location Mapper
+
+Uses:
+
+location_reference.csv
+
+Unknown locations:
+
+location_id = null
+
+Adds parse warning.
+
+---
+
+# 11. Gemini Integration Strategy
+
+Gemini is a fallback enrichment module.
+
+It is never the primary parser.
+
+It is used only when deterministic extraction fails to populate the minimum expected fields from plaintext alerts.
+
+Workflow:
+
+```
+Regex Extraction
+
+↓
+
+Required Fields Present?
+
+↓
+
+YES
+
+↓
+
+Continue
+
+↓
+
+NO
+
+↓
+
+Gemini Extraction
+
+↓
+
+Merge Missing Fields
+
+↓
+
+Continue
+```
+
+Gemini is never used for:
+
+- JSON
+- CAP XML
+- RSS XML
+
+---
+
+# 12. Deduplication Strategy
+
+Deduplication executes only after every record has been normalized.
+
+Duplicate score:
+
+| Component | Weight |
+|-----------|-------:|
+| Hazard Match | 35% |
+| Location Match | 30% |
+| Time Window Overlap | 20% |
+| Text Similarity | 15% |
+
+Threshold:
+
+0.75
+
+The first matching record is treated as canonical.
+
+Subsequent matches are marked:
+
+is_duplicate = true
+
+Records are never deleted.
+
+---
+
+# 13. Parse Warning Policy
+
+| Situation | Action |
+|-----------|--------|
+| Missing optional field | Add warning |
+| Unknown severity | Normalize to Unknown + warning |
+| Unknown urgency | Normalize to Unknown + warning |
+| Unknown certainty | Normalize to Unknown + warning |
+| Unknown location | location_id = null + warning |
+| Gemini API failure | Warning + continue |
+| Invalid enum | Normalize + warning |
+| Broken XML | Skip record |
+| Broken JSON | Skip record |
+| One malformed record | Continue processing remaining records |
+
+The batch must never terminate because of one malformed record.
+
+---
+
+# 14. Error Handling Strategy
+
+Each record is processed independently.
+
+```
+For each record
+
+↓
+
+Try
+
+↓
+
+Success
+
+↓
+
+Normalize
+
+↓
+
+Validate
+
+↓
+
+Output
+
+↓
+
+Exception
+
+↓
+
+Log Warning
+
+↓
+
+Continue
+```
+
+Failures never stop batch execution.
+
+---
+
+# 15. Logging Strategy
+
+Python logging module shall be used.
+
+Levels:
+
+- INFO
+- WARNING
+- ERROR
+
+No print statements shall be used outside debugging.
+
+---
+
+# 16. Testing Strategy
+
+Minimum pytest suite:
+
+```
+tests/
+
+test_parsers.py
+
+test_schema.py
+
+test_mapping.py
+
+test_deduplication.py
+
+test_malformed.py
+```
+
+The test suite should verify:
+
+- Parser correctness
+- Schema validation
+- Reference mappings
+- Duplicate detection
+- Graceful handling of malformed inputs
+
+---
+
+# 17. Performance Expectations
+
+The provided assignment datasets should be processed efficiently on a standard laptop.
+
+No optimization for large-scale production workloads is required.
+
+---
+
+# 18. Engineering Principles
+
+The implementation shall follow:
+
+- Single Responsibility Principle
+- Separation of Concerns
+- Modular Design
+- Deterministic Processing
+- Explainable Logic
+- Graceful Error Handling
+- AI Only Where Necessary
+- Minimal External Dependencies
+- Maintainable Code
+
+---
+
+# 19. Out-of-Scope Features
+
+The following are intentionally excluded from Version 1.0:
+
+- Authentication
+- Database
+- REST APIs
+- Web Dashboard
+- Live RSS Polling
+- Deployment
+- Docker
+- Background Processing
+- GIS Visualization
+- Analytics
+- Notifications
+- Mobile Applications
+
+These are not required by the assignment and are excluded to maintain focus.
+
+---
+
+# 20. Technical Completion Criteria
+
+The implementation is considered complete when:
+
+- All four parsers successfully process the provided datasets.
+- ParsedAlert objects are generated correctly.
+- Normalization is completed using the provided reference mappings.
+- Gemini fallback successfully enriches incomplete plaintext alerts.
+- Final records conform exactly to expected_normalized_schema.json.
+- Duplicate alerts are identified correctly.
+- Parse warnings are generated where appropriate.
+- normalized_alerts.json is generated successfully.
+- All automated tests pass.
+- Logging is implemented consistently.
+- Documentation is complete.
+
+---
+
+End of Document
+

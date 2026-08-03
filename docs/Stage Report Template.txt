@@ -1,0 +1,227 @@
+# Stage Report Template
+
+**Project Name:** Alert Intelligence Engine – Disaster Alert Parser & Normalizer
+
+**Version:** 1.0
+
+**Purpose:** Standardized report generated after the completion of every implementation stage.
+
+---
+
+# Stage Information
+
+**Stage Number:**
+
+**Stage Name:**
+
+**Status:**
+
+- ☐ Planned
+- ☐ In Progress
+- ☐ Completed
+- ☐ Frozen
+
+**Date:**
+
+---
+
+# 1. Objective
+
+Describe the goal of this stage.
+
+Example:
+
+> Implement JSON parser capable of converting raw JSON alerts into ParsedAlert objects.
+
+---
+
+# 2. Scope
+
+List everything that was intended to be completed in this stage.
+
+Example
+
+- JSON parsing
+- ParsedAlert generation
+- Structural validation
+
+---
+
+# 3. Files Created
+
+| File | Purpose |
+|------|---------|
+| | |
+| | |
+
+---
+
+# 4. Files Modified
+
+| File | Reason |
+|------|--------|
+| | |
+| | |
+
+---
+
+# 5. Public Classes
+
+| Class | Responsibility |
+|-------|----------------|
+| | |
+| | |
+
+---
+
+# 6. Public Functions
+
+| Function | Purpose |
+|----------|---------|
+| | |
+| | |
+
+---
+
+# 7. Dependencies Added
+
+Python packages or internal modules introduced during this stage.
+
+Example
+
+- lxml
+- feedparser
+- pandas
+
+---
+
+# 8. Internal Connections
+
+Describe how the newly created files interact with the existing project.
+
+Example
+
+```
+pipeline.py
+        │
+        ▼
+JSONParser
+        │
+        ▼
+ParsedAlert
+```
+
+---
+
+# 9. Tests Performed
+
+List every test executed.
+
+Example
+
+- Valid JSON
+- Missing fields
+- Invalid JSON
+- Empty input
+
+---
+
+# 10. Test Results
+
+| Test | Result |
+|------|--------|
+| | PASS / FAIL |
+| | PASS / FAIL |
+
+---
+
+# 11. Known Limitations
+
+Document limitations that are intentionally accepted for this stage.
+
+Example
+
+- No normalization yet.
+- No deduplication.
+- Plaintext parser not implemented.
+
+---
+
+# 12. Technical Debt
+
+Was any technical debt introduced?
+
+If yes:
+
+- Why?
+- Is it acceptable?
+- Which future stage resolves it?
+
+---
+
+# 13. Engineering Review
+
+Answer the following.
+
+### Does this stage satisfy its objective?
+
+YES / NO
+
+---
+
+### Is the implementation modular?
+
+YES / NO
+
+---
+
+### Is any unnecessary code present?
+
+YES / NO
+
+---
+
+### Can anything be simplified?
+
+YES / NO
+
+---
+
+### Does this stage introduce duplicated logic?
+
+YES / NO
+
+---
+
+# 14. Freeze Checklist
+
+Before freezing this stage, verify:
+
+- [ ] Feature complete
+- [ ] Tests passing
+- [ ] No unnecessary files
+- [ ] No placeholder code
+- [ ] No TODOs blocking next stage
+- [ ] Documentation updated
+- [ ] Code reviewed
+
+---
+
+# 15. Next Stage
+
+Stage Number:
+
+Stage Name:
+
+Expected Deliverables:
+
+---
+
+# 16. Summary
+
+Provide a brief summary (3–5 sentences) describing what was achieved during this stage and how it prepares the project for the next stage.
+
+---
+
+End of Stage Report
+

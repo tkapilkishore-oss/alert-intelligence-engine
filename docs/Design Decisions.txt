@@ -1,0 +1,456 @@
+# Design Decisions
+
+**Project Name:** Alert Intelligence Engine – Disaster Alert Parser & Normalizer
+
+**Version:** 1.0
+
+**Status:** Frozen
+
+**Author:** Kapil Kishore
+
+---
+
+# 1. Purpose
+
+This document records the major engineering decisions made during the design phase of the project.
+
+The purpose of this document is to:
+
+- Explain why important technical decisions were made.
+- Maintain consistency during implementation.
+- Prevent unnecessary redesign.
+- Help reviewers understand the engineering thought process.
+
+Whenever implementation decisions conflict with this document, this document takes precedence unless intentionally revised.
+
+---
+
+# 2. Design Philosophy
+
+The objective of this project is **not** to build the largest or most feature-rich application.
+
+The objective is to build a clean, modular, reliable engineering solution that satisfies the assignment requirements while demonstrating good software engineering practices.
+
+The project prioritizes:
+
+- Correctness
+- Simplicity
+- Maintainability
+- Explainability
+- Robustness
+
+over feature count.
+
+---
+
+# 3. Why We Chose a Pipeline Architecture
+
+Instead of building a monolithic parser, the project follows a sequential processing pipeline.
+
+Benefits:
+
+- Clear separation of responsibilities
+- Easier debugging
+- Easier testing
+- Easier future extension
+- Individual stages can be verified independently
+
+Pipeline:
+
+Input
+
+↓
+
+Parser
+
+↓
+
+Validation
+
+↓
+
+Normalization
+
+↓
+
+Gemini Enrichment (Plaintext Only)
+
+↓
+
+Schema Validation
+
+↓
+
+Deduplication
+
+↓
+
+Output
+
+---
+
+# 4. Why BaseParser Was Chosen
+
+A BaseParser abstract interface is used instead of individual unrelated parser implementations.
+
+Reasons:
+
+- Every parser exposes the same interface.
+- Pipeline remains independent of parser implementation.
+- Adding new formats later requires minimal changes.
+- Avoids large if/elif parsing blocks.
+
+This follows the Open/Closed Principle.
+
+---
+
+# 5. Why Parsers Return ParsedAlert Instead of Final Output
+
+Every parser returns an intermediate ParsedAlert object.
+
+Reasons:
+
+- Parsing and normalization are separate responsibilities.
+- Shared normalization logic is implemented once.
+- Avoids duplicated mapping code.
+- Easier testing.
+- Cleaner architecture.
+
+---
+
+# 6. Why a Normalization Engine Exists
+
+Normalization is implemented as a dedicated stage.
+
+Instead of each parser performing normalization independently, all parsed alerts are passed through a common Normalization Engine.
+
+Benefits:
+
+- Shared mapping logic
+- Centralized maintenance
+- Consistent output
+- Reduced duplication
+
+---
+
+# 7. Why Reference CSV Files Are Used
+
+The assignment provides:
+
+- severity_mapping_reference.csv
+- location_reference.csv
+
+These files are treated as the authoritative source for mappings.
+
+No values are hardcoded unless absolutely necessary.
+
+Benefits:
+
+- Assignment compliance
+- Easy updates
+- Cleaner implementation
+
+---
+
+# 8. Why Gemini Is a Fallback (Not the Primary Parser)
+
+Gemini is intentionally **not** used for structured formats.
+
+Structured formats (JSON, CAP XML, RSS) already contain machine-readable information.
+
+Using an LLM would:
+
+- Increase latency
+- Increase cost
+- Reduce determinism
+- Add unnecessary complexity
+
+Gemini is used only when deterministic extraction from plaintext is insufficient.
+
+Workflow:
+
+Regex Extraction
+
+↓
+
+Required Fields Present?
+
+↓
+
+Yes
+
+↓
+
+Continue
+
+↓
+
+No
+
+↓
+
+Gemini
+
+↓
+
+Merge Missing Fields
+
+↓
+
+Continue
+
+This demonstrates appropriate AI usage rather than AI overuse.
+
+---
+
+# 9. Why Regex Runs Before Gemini
+
+Regex extraction is attempted first because:
+
+- Faster
+- Deterministic
+- Free
+- Explainable
+- Reliable for structured text patterns
+
+Gemini is only used to recover missing information.
+
+This minimizes API usage while maximizing reliability.
+
+---
+
+# 10. Why Two Validation Stages Exist
+
+Validation is intentionally split into two stages.
+
+## Stage 1
+
+Structural Validation
+
+Purpose:
+
+Determine whether parsing produced a usable ParsedAlert.
+
+## Stage 2
+
+Schema Validation
+
+Purpose:
+
+Ensure the final NormalizedAlert satisfies the expected schema.
+
+Benefits:
+
+- Better error isolation
+- Cleaner debugging
+- Easier testing
+
+---
+
+# 11. Why Deduplication Runs Last
+
+Deduplication requires fully normalized alerts.
+
+Running duplicate detection before normalization would compare incomplete records.
+
+Therefore deduplication executes only after:
+
+- Parsing
+- Validation
+- Mapping
+- Gemini enrichment
+
+This improves duplicate detection accuracy.
+
+---
+
+# 12. Why Deterministic Deduplication Was Chosen
+
+Embeddings or semantic similarity models were intentionally avoided.
+
+Instead, duplicates are identified using weighted deterministic rules.
+
+Factors:
+
+- Hazard match
+- Location match
+- Time overlap
+- Text similarity
+
+Reasons:
+
+- Explainable
+- Predictable
+- Fast
+- Assignment-appropriate
+- Easy to justify
+
+---
+
+# 13. Why No Database Was Used
+
+The assignment requires batch processing of provided datasets.
+
+There is no requirement for:
+
+- User accounts
+- Historical storage
+- Querying
+- Persistence
+
+Adding a database would increase complexity without improving the assignment deliverables.
+
+The system therefore processes everything in memory.
+
+---
+
+# 14. Why No Web Backend Was Built
+
+The project is a processing engine, not a web application.
+
+Backend frameworks such as FastAPI are intentionally excluded because:
+
+- No API endpoints are required.
+- No client-server communication exists.
+- The assignment evaluates parsing logic rather than backend development.
+
+---
+
+# 15. Why UI Is Not Part of Version 1.0
+
+The assignment does not require:
+
+- Dashboards
+- Charts
+- Interactive interfaces
+
+Therefore Version 1.0 focuses entirely on the processing engine.
+
+A minimal UI may be added only if all core functionality is completed.
+
+---
+
+# 16. Why Logging Is Used Instead of Print
+
+Python's logging module provides:
+
+- Severity levels
+- Better debugging
+- Cleaner output
+- Easier troubleshooting
+
+Logging reflects production-quality engineering practices.
+
+---
+
+# 17. Why Every Record Is Processed Independently
+
+One malformed alert must never terminate processing.
+
+Each record is processed inside its own exception boundary.
+
+Benefits:
+
+- Fault tolerance
+- Robust batch execution
+- Easier debugging
+- Better resilience
+
+---
+
+# 18. Why Stage-Based Development Was Chosen
+
+The project is intentionally divided into implementation stages.
+
+Reasons:
+
+- Reduce hallucination from AI coding tools.
+- Easier debugging.
+- Smaller reviewable units.
+- Incremental testing.
+- Lower implementation risk.
+
+Each stage must be:
+
+- Implemented
+- Tested
+- Documented
+- Frozen
+
+before proceeding.
+
+---
+
+# 19. Why Stage Reports Are Generated
+
+After every implementation stage, a Stage Report will be created.
+
+Each report records:
+
+- Files created
+- Files modified
+- Public classes
+- Public functions
+- Dependencies
+- Test status
+- Known limitations
+
+Benefits:
+
+- Easier debugging
+- Easier code review
+- Better project tracking
+- Reduced AI hallucination
+
+---
+
+# 20. Out-of-Scope Decisions
+
+The following decisions were intentionally made to prevent scope creep:
+
+Not Included:
+
+- Authentication
+- Database
+- Deployment
+- Docker
+- FastAPI
+- Live RSS polling
+- Real-time processing
+- Notifications
+- Analytics
+- GIS visualization
+- Mobile application
+
+These features do not improve the assignment evaluation and are excluded from Version 1.0.
+
+---
+
+# 21. Engineering Principles
+
+Throughout implementation, the project will follow:
+
+- Single Responsibility Principle
+- Separation of Concerns
+- Modular Design
+- Deterministic Processing
+- Explainable Engineering
+- AI Only Where Necessary
+- Graceful Error Handling
+- Minimal External Dependencies
+- Maintainable Code
+
+---
+
+# 22. Final Design Commitment
+
+This document represents the frozen architectural decisions for Version 1.0.
+
+Future implementation must follow these principles unless a documented design revision is approved.
+
+The objective is to prioritize execution quality over feature expansion.
+
+---
+
+End of Document
+

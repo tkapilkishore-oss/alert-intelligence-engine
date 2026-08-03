@@ -1,0 +1,161 @@
+<alerts>
+  <alert>
+    <identifier>CAP-001</identifier>
+    <sender>weather-demo@example.org</sender>
+    <sent>2025-07-18T21:00:00+05:30</sent>
+    <status>Actual</status>
+    <msgType>Alert</msgType>
+    <info>
+      <event>Lightning</event>
+      <urgency>Expected</urgency>
+      <severity>Severe</severity>
+      <certainty>Observed</certainty>
+      <onset>2025-07-18T21:00:00+05:30</onset>
+      <expires>2025-07-19T13:00:00+05:30</expires>
+      <area>
+        <areaDesc>Vanasthal</areaDesc>
+      </area>
+      <instruction>Stay indoors and avoid open fields or isolated trees.</instruction>
+    </info>
+  </alert>
+
+  <alert>
+    <identifier>CAP-002</identifier>
+    <sender>state-eoc-demo@example.org</sender>
+    <sent>2025-07-15T13:00:00+05:30</sent>
+    <status>Actual</status>
+    <msgType>Alert</msgType>
+    <info>
+      <event>Urban Flood</event>
+      <urgency>Immediate</urgency>
+      <severity>Extreme</severity>
+      <certainty>Observed</certainty>
+      <onset>2025-07-15T13:00:00+05:30</onset>
+      <expires>2025-07-15T21:00:00+05:30</expires>
+      <area>
+        <areaDesc>Devapur Block 3</areaDesc>
+      </area>
+      <instruction>Avoid low-lying roads and move valuables above ground level.</instruction>
+    </info>
+  </alert>
+
+  <alert>
+    <identifier>CAP-003</identifier>
+    <sender>weather-demo@example.org</sender>
+    <sent>2025-07-17T05:00:00+05:30</sent>
+    <status>Actual</status>
+    <msgType>Alert</msgType>
+    <info>
+      <event>Lightning</event>
+      <urgency>Immediate</urgency>
+      <severity>Severe</severity>
+      <certainty>Possible</certainty>
+      <onset>2025-07-17T05:00:00+05:30</onset>
+      <expires>2025-07-17T21:00:00+05:30</expires>
+      <area>
+        <areaDesc>Nirmala Block 2</areaDesc>
+      </area>
+      <instruction>Stay indoors and avoid open fields or isolated trees.</instruction>
+    </info>
+  </alert>
+
+  <alert>
+    <identifier>CAP-004</identifier>
+    <sender>state-eoc-demo@example.org</sender>
+    <sent>2025-07-17T09:00:00+05:30</sent>
+    <status>Actual</status>
+    <msgType>Alert</msgType>
+    <info>
+      <event>Heat Wave</event>
+      <urgency>Expected</urgency>
+      <severity>Minor</severity>
+      <certainty>Possible</certainty>
+      <onset>2025-07-17T09:00:00+05:30</onset>
+      <expires>2025-07-18T09:00:00+05:30</expires>
+      <area>
+        <areaDesc>Suryanagar</areaDesc>
+      </area>
+      <instruction>Avoid outdoor work between 12:00 and 15:00; drink water frequently.</instruction>
+    </info>
+  </alert>
+
+  <alert>
+    <identifier>CAP-005</identifier>
+    <sender>state-eoc-demo@example.org</sender>
+    <sent>2025-07-15T09:00:00+05:30</sent>
+    <status>Actual</status>
+    <msgType>Alert</msgType>
+    <info>
+      <event>Lightning</event>
+      <urgency>Future</urgency>
+      <severity>Moderate</severity>
+      <certainty>Likely</certainty>
+      <onset>2025-07-15T09:00:00+05:30</onset>
+      <expires>2025-07-16T01:00:00+05:30</expires>
+      <area>
+        <areaDesc>Kalyanpur Block 1</areaDesc>
+      </area>
+      <instruction>Stay indoors and avoid open fields or isolated trees.</instruction>
+    </info>
+  </alert>
+
+  <alert>
+    <identifier>CAP-006</identifier>
+    <sender>weather-demo@example.org</sender>
+    <sent>2025-07-18T12:00:00+05:30</sent>
+    <status>Actual</status>
+    <msgType>Alert</msgType>
+    <info>
+      <event>Landslide</event>
+      <urgency>Future</urgency>
+      <severity>Extreme</severity>
+      <certainty>Likely</certainty>
+      <onset>2025-07-18T12:00:00+05:30</onset>
+      <expires>2025-07-19T04:00:00+05:30</expires>
+      <area>
+        <areaDesc>Port Lakshmi Block 1</areaDesc>
+      </area>
+      <instruction>Avoid hill roads and report slope cracks to local authorities.</instruction>
+    </info>
+  </alert>
+
+  <alert>
+    <identifier>CAP-007</identifier>
+    <sender>state-eoc-demo@example.org</sender>
+    <sent>2025-07-15T09:00:00+05:30</sent>
+    <status>Actual</status>
+    <msgType>Alert</msgType>
+    <info>
+      <event>Urban Flood</event>
+      <urgency>Expected</urgency>
+      <severity>Moderate</severity>
+      <certainty>Observed</certainty>
+      <onset>2025-07-15T09:00:00+05:30</onset>
+      <expires>2025-07-15T17:00:00+05:30</expires>
+      <area>
+        <areaDesc>Suryanagar Block 3</areaDesc>
+      </area>
+      <instruction>Avoid low-lying roads and move valuables above ground level.</instruction>
+    </info>
+  </alert>
+
+  <alert>
+    <identifier>CAP-008</identifier>
+    <sender>state-eoc-demo@example.org</sender>
+    <sent>2025-07-18T06:00:00+05:30</sent>
+    <status>Actual</status>
+    <msgType>Alert</msgType>
+    <info>
+      <event>Lightning</event>
+      <urgency>Immediate</urgency>
+      <severity>Moderate</severity>
+      <certainty>Observed</certainty>
+      <onset>2025-07-18T06:00:00+05:30</onset>
+      <expires>2025-07-19T06:00:00+05:30</expires>
+      <area>
+        <areaDesc>Vanasthal Block 1</areaDesc>
+      </area>
+      <instruction>Stay indoors and avoid open fields or isolated trees.</instruction>
+    </info>
+  </alert>
+</alerts>

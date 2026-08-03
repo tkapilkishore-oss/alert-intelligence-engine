@@ -1,0 +1,445 @@
+# Engineering Rules
+
+**Project Name:** Alert Intelligence Engine – Disaster Alert Parser & Normalizer
+
+**Version:** 1.0
+
+**Status:** Frozen
+
+**Purpose:** Defines the engineering rules, coding standards, implementation workflow, and AI-agent behavior for Version 1.0.
+
+---
+
+# 1. Purpose
+
+This document defines how implementation must be performed throughout the project.
+
+Every implementation prompt should assume this document has already been read.
+
+These rules exist to:
+
+- Prevent hallucination
+- Prevent unnecessary refactoring
+- Maintain architectural consistency
+- Reduce implementation risk
+- Keep scope aligned with the assignment
+
+---
+
+# 2. Context Priority
+
+Whenever there is conflicting information, follow this priority order.
+
+1. Assignment Instructions
+2. Company Dataset
+3. Expected Normalized Schema
+4. PRD
+5. TRD
+6. Design Decisions
+7. Current Stage Prompt
+8. Engineering Rules
+9. AI Assumptions
+
+Never override a higher-priority source with a lower-priority assumption.
+
+---
+
+# 3. Architecture Is Frozen
+
+The architecture defined in the TRD is considered frozen.
+
+Do NOT:
+
+- redesign the pipeline
+- rename major modules
+- move files unnecessarily
+- introduce new architectural patterns
+- merge modules without instruction
+- split modules without instruction
+
+Only modify the architecture if explicitly instructed.
+
+---
+
+# 4. Stage-Based Development
+
+Development is strictly stage-based.
+
+Implement only the requested stage.
+
+Never generate code belonging to future stages.
+
+Every stage must:
+
+- compile independently
+- be testable
+- be documented
+- be frozen before continuing
+
+---
+
+# 5. Scope Control
+
+Only implement features required for the current stage.
+
+Never add:
+
+- bonus features
+- future improvements
+- speculative functionality
+- "nice-to-have" modules
+
+unless explicitly requested.
+
+---
+
+# 6. File Modification Policy
+
+When modifying existing files:
+
+Always list:
+
+- files that will be modified
+- reason for modification
+
+before generating code.
+
+Never silently change unrelated files.
+
+---
+
+# 7. Code Generation Principles
+
+Generated code should be:
+
+- modular
+- readable
+- production-quality
+- minimal
+- deterministic
+
+Avoid:
+
+- unnecessary abstraction
+- excessive inheritance
+- placeholder implementations
+- duplicated logic
+
+---
+
+# 8. Coding Standards
+
+Follow:
+
+- Python 3.11+
+- Type hints wherever practical
+- Meaningful class names
+- Meaningful function names
+- Clear docstrings for public methods
+- Small focused functions
+
+Avoid:
+
+- long functions
+- deeply nested logic
+- magic numbers
+- global state
+
+---
+
+# 9. Parser Responsibilities
+
+Each parser should ONLY:
+
+- parse its own format
+- extract raw fields
+- return ParsedAlert
+
+Parsers must NOT:
+
+- normalize values
+- call Gemini
+- perform deduplication
+- validate final schema
+
+---
+
+# 10. Normalization Rules
+
+Normalization is centralized.
+
+Individual parsers must never perform:
+
+- severity mapping
+- location mapping
+- urgency mapping
+- certainty mapping
+
+All normalization happens inside the Normalization Engine.
+
+---
+
+# 11. Gemini Usage Policy
+
+Gemini is a fallback enrichment mechanism.
+
+Gemini must never be:
+
+- the primary parser
+- used for JSON
+- used for CAP XML
+- used for RSS
+
+Workflow:
+
+Regex
+
+↓
+
+Enough required fields?
+
+↓
+
+YES
+
+↓
+
+Continue
+
+↓
+
+NO
+
+↓
+
+Gemini
+
+↓
+
+Merge missing fields
+
+↓
+
+Continue
+
+Never overwrite deterministic parser output.
+
+Only fill missing values.
+
+---
+
+# 12. Validation Policy
+
+Validation occurs in two stages.
+
+Stage 1
+
+Structural Validation
+
+↓
+
+Parser output
+
+Stage 2
+
+Schema Validation
+
+↓
+
+NormalizedAlert
+
+Never skip either validation stage.
+
+---
+
+# 13. Error Handling
+
+One malformed record must never terminate the batch.
+
+Process every record independently.
+
+Preferred pattern:
+
+Try
+
+↓
+
+Process
+
+↓
+
+Success
+
+↓
+
+Continue
+
+↓
+
+Exception
+
+↓
+
+Log warning
+
+↓
+
+Continue next record
+
+---
+
+# 14. Logging
+
+Use Python logging.
+
+Levels:
+
+- INFO
+- WARNING
+- ERROR
+
+Avoid print statements except temporary debugging.
+
+---
+
+# 15. Testing Policy
+
+Every stage must include tests before completion.
+
+Do not postpone testing until the final stage.
+
+Each stage should verify:
+
+- new functionality
+- existing functionality
+- integration with previous stages
+
+---
+
+# 16. Stage Completion Rules
+
+A stage is complete only if:
+
+✓ Feature implemented
+
+✓ Code reviewed
+
+✓ Tests pass
+
+✓ Stage Report generated
+
+✓ Git commit completed
+
+Only then proceed.
+
+---
+
+# 17. Stage Reports
+
+After every completed stage, generate a Stage Report using the predefined template.
+
+The report must include:
+
+- Files created
+- Files modified
+- Public classes
+- Public functions
+- Dependencies
+- Tests performed
+- Known limitations
+- Next stage dependencies
+
+---
+
+# 18. Self Review
+
+Before considering any stage complete, answer:
+
+- Does this code satisfy the current stage only?
+- Did I accidentally implement future features?
+- Is there duplicated logic?
+- Can any function be simplified?
+- Are responsibilities clearly separated?
+- Does the project still follow the frozen architecture?
+
+If any answer indicates a problem, fix it before completing the stage.
+
+---
+
+# 19. Ponytail Coding Skill
+
+Always use the Ponytail coding skill.
+
+Code should emphasize:
+
+- clarity
+- maintainability
+- modularity
+- meaningful naming
+- minimal complexity
+
+Avoid generating unnecessary boilerplate.
+
+---
+
+# 20. Documentation Policy
+
+Implementation should remain synchronized with documentation.
+
+Whenever implementation changes affect:
+
+- architecture
+- responsibilities
+- public APIs
+
+update the relevant documentation before completing the stage.
+
+---
+
+# 21. Definition of Success
+
+The project succeeds when:
+
+- The implementation satisfies the assignment requirements.
+- Every stage is independently verifiable.
+- The codebase remains modular.
+- AI is used only where it provides genuine value.
+- Documentation accurately reflects implementation.
+- No unnecessary features are introduced.
+
+---
+
+# 22. Final Engineering Commitment
+
+This project follows a disciplined engineering workflow.
+
+The priority is:
+
+Correctness
+
+↓
+
+Robustness
+
+↓
+
+Maintainability
+
+↓
+
+Readability
+
+↓
+
+Feature Count
+
+Whenever a trade-off exists, prefer the simpler solution that fully satisfies the assignment requirements.
+
+The goal is not to build the largest system.
+
+The goal is to build the cleanest engineering solution.
+
+---
+
+End of Document
+
