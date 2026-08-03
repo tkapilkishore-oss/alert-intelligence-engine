@@ -1,6 +1,9 @@
-"""Datetime utility function skeletons."""
+"""Datetime utility functions for Alert Intelligence Engine."""
 
 from typing import Optional
+from src.mappers.datetime_mapper import DatetimeMapper
+
+_mapper_instance = DatetimeMapper()
 
 
 def normalize_datetime(raw_datetime: Optional[str]) -> Optional[str]:
@@ -12,5 +15,5 @@ def normalize_datetime(raw_datetime: Optional[str]) -> Optional[str]:
     Returns:
         Optional[str]: Standardized ISO-8601 formatted datetime string or None.
     """
-    # TODO: Stage 7 — Implement datetime parsing and ISO-8601 normalization
-    raise NotImplementedError("Datetime normalization will be implemented in Stage 7.")
+    iso_str, _ = _mapper_instance.map_datetime(raw_datetime)
+    return iso_str

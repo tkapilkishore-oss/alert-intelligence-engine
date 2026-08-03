@@ -68,9 +68,8 @@ def test_logger_initialization() -> None:
 
 
 def test_utility_skeletons_exist() -> None:
-    """Verify utility function skeletons exist and raise NotImplementedError on call."""
-    with pytest.raises(NotImplementedError):
-        normalize_datetime("2026-08-03T00:00:00Z")
+    """Verify Stage 7 datetime normalization works and unimplemented Stage 5 utility skeletons raise NotImplementedError."""
+    assert normalize_datetime("2026-08-03T00:00:00Z") == "2026-08-03T00:00:00+00:00"
 
     with pytest.raises(NotImplementedError):
         clean_text("sample")

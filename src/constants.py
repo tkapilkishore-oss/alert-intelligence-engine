@@ -4,7 +4,8 @@ from pathlib import Path
 
 # Base Directories
 BASE_DIR: Path = Path(__file__).resolve().parent.parent
-DATA_DIR: Path = BASE_DIR / "data" / "provided"
+_provided_dir = BASE_DIR / "data" / "provided"
+DATA_DIR: Path = _provided_dir if _provided_dir.exists() else BASE_DIR / "data"
 DOCS_DIR: Path = BASE_DIR / "docs"
 OUTPUTS_DIR: Path = BASE_DIR / "outputs"
 
