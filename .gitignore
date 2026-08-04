@@ -18,7 +18,9 @@ htmlcov/
 # System Files & Secret Configs
 .DS_Store
 .env
+.streamlit/secrets.toml
 *.log
+
 
 # Engine Output Data
 outputs/

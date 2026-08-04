@@ -193,6 +193,79 @@ TOTAL DUPLICATES : 2
 
 ---
 
+## Streamlit Web Dashboard (Presentation Layer)
+
+The project includes a modern, high-performance Streamlit presentation dashboard layer (`app.py`).
+
+### Key Features
+- **Zero Engine Modifications**: Client of the frozen `AlertPipeline`.
+- **Sample Datasets**: One-click sample loading for JSON, CAP XML, RSS XML, Plaintext, and Natural Language inputs.
+- **Processing Time Metric**: Execution speed measured in milliseconds (`time.perf_counter()`).
+- **Real-Time Presentation Filters & Search**: Search by Alert ID, Location, or Hazard, with dropdown filters for Severity and Duplicate status.
+- **Dual Result Views**: Executive Cards (expanders with color-coded severity/duplicate badges) + Compact Data Table (sortable grid).
+- **Interactive Pipeline Flow Diagram**: Graphical pipeline visualizer highlighting the active source format and Gemini fallback stage.
+- **Raw JSON & One-Click Exports**: Instant Download JSON (`normalized_alerts.json`) and Download CSV (`normalized_alerts.csv`).
+- **Complete Demo Mode**: One-click "Run Complete Demo" processing all 5 input streams sequentially.
+- **Error Handling Panels**: User-friendly styled warning panels for invalid JSON, broken XML, or Gemini API limits without app crashes.
+
+### Launching the Dashboard Locally
+
+```bash
+# Activate virtual environment
+source .venv/bin/activate
+
+# Run Streamlit application
+streamlit run app.py
+```
+
+Open `http://localhost:8501` in your browser.
+
+---
+
+## Streamlit Community Cloud Deployment
+
+The repository is configured for 1-click deployment on **Streamlit Community Cloud**.
+
+### Deployment Steps
+1. Push this repository to GitHub.
+2. Sign in to [Streamlit Community Cloud](https://share.streamlit.io/).
+3. Click **New App** and select your repository, branch (`main`), and main file path (`app.py`).
+4. Under **Advanced settings** -> **Secrets**, add your optional Gemini API Key:
+   ```toml
+   GEMINI_API_KEY = "your_google_gemini_api_key_here"
+   ```
+5. Click **Deploy!**
+
+*For comprehensive step-by-step instructions and troubleshooting, see [DEPLOYMENT.md](file:///Users/tkapilkishore/Desktop/alert-intelligence-engine/DEPLOYMENT.md).*
+
+
+---
+
+## Dashboard Screenshots Placeholder
+
+> [!NOTE]
+> Below are placeholders for visual dashboard documentation.
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ 🛡️ Alert Intelligence Engine — Executive Dashboard                         │
+│ [● Engine Status: READY] [Pipeline v1.0.0] [123 Tests Passed]                │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ SUMMARY METRICS                                                             │
+│ ┌───────────────┐ ┌───────────────┐ ┌───────────────┐ ┌──────────────────┐ │
+│ │ Alerts: 14    │ │ Duplicates: 1 │ │ Warnings: 0   │ │ Speed: 18.2 ms   │ │
+│ └───────────────┘ └───────────────┘ └───────────────┘ └──────────────────┘ │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ EXECUTIVE RESULT CARDS                                                      │
+│ 🔽 Alert #1: JSON-001 | Urban Flood (Nirmala) [MODERATE] [CANONICAL]        │
+│ 🔽 Alert #2: JSON-002 | Lightning (Kalyanpur) [EXTREME] [CANONICAL]        │
+│ 🔽 Alert #3: JSON-005 | Urban Flood (Kalyanpur) [EXTREME] [DUPLICATE]       │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+
+---
+
 ## Running Tests
 
 Execute the complete test suite (123 test cases):
