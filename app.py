@@ -38,13 +38,20 @@ st.set_page_config(
 # Inject Custom CSS
 st.markdown(MAIN_CSS, unsafe_allow_html=True)
 
-# Streamlit Community Cloud Secrets Bridge
-if "GEMINI_API_KEY" in st.secrets and not os.getenv("GEMINI_API_KEY"):
-    os.environ["GEMINI_API_KEY"] = str(st.secrets["GEMINI_API_KEY"])
+# Streamlit Community Cloud Secrets Bridge (Production-Safe)
+try:
+    if hasattr(st, "secrets") and "GEMINI_API_KEY" in st.secrets:
+        secret_key = st.secrets.get("GEMINI_API_KEY")
+        if secret_key and not os.getenv("GEMINI_API_KEY"):
+            os.environ["GEMINI_API_KEY"] = str(secret_key)
+except Exception:
+    # Secrets file or secrets dictionary not present in environment; safe fallback
+    pass
 
 
 @st.cache_resource
 def get_pipeline() -> AlertPipeline:
+
 
     """Instantiate and cache single AlertPipeline instance.
 
