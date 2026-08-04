@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional
 from src.deduplicator import DeduplicationEngine
 from src.gemini_extractor import GeminiExtractor
 from src.logger import get_logger
+from src.nlp_processor import NaturalLanguageProcessor
 from src.normalization import NormalizationEngine
 from src.parsers.base_parser import BaseParser
 from src.parsers.cap_parser import CapParser
@@ -26,6 +27,7 @@ class AlertPipeline:
         gemini_extractor: Optional[GeminiExtractor] = None,
         normalization_engine: Optional[NormalizationEngine] = None,
         deduplication_engine: Optional[DeduplicationEngine] = None,
+        nlp_processor: Optional[NaturalLanguageProcessor] = None,
     ) -> None:
         """Initialize AlertPipeline with processing engines.
 
@@ -34,11 +36,13 @@ class AlertPipeline:
             gemini_extractor: Optional GeminiExtractor instance.
             normalization_engine: Optional NormalizationEngine instance.
             deduplication_engine: Optional DeduplicationEngine instance.
+            nlp_processor: Optional NaturalLanguageProcessor instance.
         """
         self._validator = validator or ValidationEngine()
         self._gemini_extractor = gemini_extractor or GeminiExtractor()
         self._normalization_engine = normalization_engine or NormalizationEngine()
         self._deduplication_engine = deduplication_engine or DeduplicationEngine()
+        self._nlp_processor = nlp_processor or NaturalLanguageProcessor()
         self._parsers: Dict[str, BaseParser] = {
             "json": JsonParser(),
             "cap_xml": CapParser(),
@@ -72,6 +76,31 @@ class AlertPipeline:
         parser = self._get_parser(source_format)
         parsed_alerts = self._parse(parser, raw_data)
         structurally_valid = self._validate_parsed(parsed_alerts)
+        enriched_alerts = self._gemini_enrich(structurally_valid)
+        normalized_alerts = self._normalize(enriched_alerts)
+        schema_valid_alerts = self._validate_normalized(normalized_alerts)
+        return self._deduplicate(schema_valid_alerts)
+
+    def process_natural_language(self, text: str) -> List[NormalizedAlert]:
+        """Process free-form user natural language input through NaturalLanguageProcessor and pipeline.
+
+        Pipeline Execution Order:
+            1. NaturalLanguageProcessor converts text to ParsedAlert
+            2. Structural Validation (_validate_parsed)
+            3. Gemini Fallback Enrichment (_gemini_enrich)
+            4. Field Normalization (_normalize)
+            5. Final Schema Validation (_validate_normalized)
+            6. Batch Deduplication (_deduplicate)
+            7. Return List[NormalizedAlert]
+
+        Args:
+            text: Free-form user disaster alert text string.
+
+        Returns:
+            List[NormalizedAlert]: List of deduplicated, schema-validated normalized alerts.
+        """
+        parsed_alert = self._nlp_processor.process(text)
+        structurally_valid = self._validate_parsed([parsed_alert])
         enriched_alerts = self._gemini_enrich(structurally_valid)
         normalized_alerts = self._normalize(enriched_alerts)
         schema_valid_alerts = self._validate_normalized(normalized_alerts)
