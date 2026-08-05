@@ -219,25 +219,36 @@ Open `http://localhost:8501` in your browser.
 ## 📊 Dashboard Preview
 
 ### Home Dashboard
-*(Add Screenshot)*
+![Home Dashboard](assets/01_home_dashboard.png)
+*Initial landing page displaying system architecture status badges, interactive format selector, and engine workflow overview.*
 
 ### JSON Processing
-*(Add Screenshot)*
+![JSON Processing](assets/02_json_processing.png)
+*Interactive processing of structured JSON alert feeds with normalized executive cards and status indicators.*
 
 ### CAP XML Processing
-*(Add Screenshot)*
+![CAP XML Processing](assets/03_cap_processing.png)
+*Parsing and schema normalization of OASIS Common Alerting Protocol (CAP v1.2) XML feeds.*
 
 ### RSS Processing
-*(Add Screenshot)*
+![RSS Processing](assets/04_rss_processing.png)
+*Ingestion of RSS 2.0 XML feeds with automatic fallback mapping and graceful parse warning logging.*
+
+### Plaintext Processing
+![Plaintext Processing](assets/05_plaintext_processing.png)
+*Deterministic regex extraction of unstructured plaintext alert notifications with batch execution metrics.*
 
 ### Natural Language Processing
-*(Add Screenshot)*
+![Natural Language Processing](assets/06_natural_language_processing.png)
+*Targeted Google Gemini AI fallback enrichment converting free-form natural language prompts into normalized schema records.*
 
 ### Pipeline Visualization
-*(Add Screenshot)*
+![Pipeline Visualization](assets/07_pipeline_visualization.png)
+*Interactive visual execution flow diagram highlighting the 7-stage AlertPipeline architectural process.*
 
 ### About Page
-*(Add Screenshot)*
+![About Page](assets/08_about_page.png)
+*Comprehensive system specifications, technical stack breakdown, and implementation status across all 12 engine stages.*
 
 ---
 
