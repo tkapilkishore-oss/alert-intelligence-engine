@@ -2,14 +2,13 @@
 
 [![Python Version](https://img.shields.io/badge/Python-3.11%2B-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.42%2B-FF4B4B?style=flat-square&logo=streamlit&logoColor=white)](https://streamlit.io/)
-[![Google Gemini](https://img.shields.io/badge/Gemini-2.5--Flash-8E75B2?style=flat-square&logo=googlegemini&logoColor=white)](https://ai.google.dev/)
-[![Tests Passing](https://img.shields.io/badge/Tests-123%20Passed-success?style=flat-square&logo=pytest&logoColor=white)](tests/)
+[![Tests Passing](https://img.shields.io/badge/Tests-130%20Passed-success?style=flat-square&logo=pytest&logoColor=white)](tests/)
 [![Version](https://img.shields.io/badge/Version-1.0.0-blue?style=flat-square)](https://github.com/tkapilkishore-oss/alert-intelligence-engine)
 [![Deployment Status](https://img.shields.io/badge/Deployment-Live-brightgreen?style=flat-square&logo=streamlit)](https://alert-intelligence-engine.streamlit.app/)
 
 **Version:** 1.0.0 | **Author:** Kapil Kishore | **Organization:** Resilience AI
 
-The **Alert Intelligence Engine** is a production-grade disaster alert parsing, normalization, validation, and deduplication system. It ingests heterogeneous disaster alerts from multiple structured (JSON), semi-structured (CAP XML, RSS XML), and natural language sources, extracts disaster information, normalizes fields against authoritative reference standards, validates outputs against unified schemas, detects duplicates across sources using multi-factor matching, and outputs standardized machine-readable JSON records (`normalized_alerts.json`).
+The **Alert Intelligence Engine** is a production-grade disaster alert parsing, normalization, validation, and deduplication system. It ingests heterogeneous disaster alerts from multiple structured (JSON), semi-structured (CAP XML, RSS XML), and plaintext sources, extracts disaster information, normalizes fields against authoritative reference standards, validates outputs against unified schemas, detects duplicates across sources using multi-factor matching, and outputs standardized machine-readable JSON records (`normalized_alerts.json`).
 
 ---
 
@@ -24,7 +23,7 @@ The **Alert Intelligence Engine** is a production-grade disaster alert parsing, 
 ## ⚡ Quick Start
 
 ```
-Clone Repository  ──►  Install Requirements  ──►  Add GEMINI_API_KEY (Optional)  ──►  Run Streamlit  ──►  Process Alerts
+Clone Repository  ──►  Install Requirements  ──►  Run Streamlit  ──►  Process Alerts
 ```
 
 1. **Clone Repository**:
@@ -38,16 +37,11 @@ Clone Repository  ──►  Install Requirements  ──►  Add GEMINI_API_KEY
    source .venv/bin/activate
    pip install -r requirements.txt
    ```
-3. **Add GEMINI_API_KEY** *(Optional for AI Fallback Enrichment)*:
-   ```bash
-   cp .env.example .env
-   # Edit .env and set GEMINI_API_KEY=your_key_here
-   ```
-4. **Run Streamlit Dashboard**:
+3. **Run Streamlit Dashboard**:
    ```bash
    streamlit run app.py
    ```
-5. **Process Alerts**: Open `http://localhost:8501` to test JSON, CAP XML, RSS XML, Plaintext, & Natural Language alert processing.
+4. **Process Alerts**: Open `http://localhost:8501` to test JSON, CAP XML, RSS XML, & Plaintext alert processing.
 
 ---
 
@@ -55,12 +49,12 @@ Clone Repository  ──►  Install Requirements  ──►  Add GEMINI_API_KEY
 
 | Category | Details & Specifications |
 | :--- | :--- |
-| **Supported Formats** | JSON (`json`), CAP XML 1.2 (`cap_xml`), RSS XML 2.0 (`rss`), Plaintext (`plaintext`), Natural Language Prompts |
-| **AI Enrichment** | Targeted Google Gemini API (`gemini-2.5-flash`) fallback for missing plaintext/NLP fields with zero-downtime tolerance |
-| **Normalization** | Unified mapping for Severity, Urgency, Certainty, Location IDs, and ISO 8601 Datetime standard |
+| **Supported Formats** | JSON (`json`), CAP XML 1.2 (`cap_xml`), RSS XML 2.0 (`rss`), Plaintext (`plaintext`) |
+| **Parsing Engine** | Deterministic multi-format ingestion with high-speed regex pattern matching & XML/JSON schema parsing |
+| **Normalization** | Unified mapping for Severity, Urgency, Certainty, NDMA District Location IDs, and ISO 8601 UTC Datetimes |
 | **Deduplication** | Weighted multi-factor duplicate detection (Hazard, Location, Time-window matching score $\ge 0.75$) |
 | **Validation** | Dual-pass validation: Structural Field Integrity + Pydantic v2 Schema Compliance (100% strict contracts) |
-| **Core Technologies** | Python 3.11+, Streamlit 1.42+, Google Gemini SDK, Pydantic v2, Pytest (123 tests passing) |
+| **Core Technologies** | Python 3.11+, Streamlit 1.42+, Pydantic v2, Pandas, RapidFuzz, Pytest (130 tests passing) |
 
 ---
 
@@ -73,12 +67,10 @@ flowchart TD
         CAP["CAP XML Alerts"]
         RSS["RSS XML Alerts"]
         PT["Plaintext Alerts"]
-        NL["Natural Language Prompts"]
     end
 
     subgraph Entry ["Format Routing & Preprocessing"]
         Router["Format Parser Router"]
-        NLP["Natural Language Processor"]
     end
 
     subgraph Parsing ["Deterministic Parsers"]
@@ -90,10 +82,9 @@ flowchart TD
 
     subgraph CoreEngine ["Alert Pipeline Processing Engine"]
         SV["Structural Validation (ValidationEngine)"]
-        GF["Gemini Fallback Enrichment (GeminiExtractor)"]
         NE["Normalization Engine (Mappers)"]
         FV["Schema Validation (ValidationEngine)"]
-        DD["Batch Deduplication (DeduplicationEngine)"]
+        DD["Batch Deduplication Engine (DeduplicationEngine)"]
     end
 
     JSON --> Router
@@ -106,16 +97,12 @@ flowchart TD
     Router -->|rss| RP
     Router -->|plaintext| PP
 
-    NL --> NLP
-    NLP -->|ParsedAlert| SV
-
     JP -->|ParsedAlert| SV
     CP -->|ParsedAlert| SV
     RP -->|ParsedAlert| SV
     PP -->|ParsedAlert| SV
 
-    SV --> GF
-    GF --> NE
+    SV --> NE
     NE --> FV
     FV --> DD
     DD --> Output["List[NormalizedAlert] / normalized_alerts.json"]
@@ -126,19 +113,16 @@ flowchart TD
 ## 🔄 Pipeline Flow
 
 ```
-Input Raw Data
+Input Raw Data (JSON, CAP XML, RSS XML, Plaintext)
   │
   ▼
-Parser Router / Natural Language Processor
+Format Parser Router
   │
   ▼
 ParsedAlert (Unnormalized Intermediate Object)
   │
   ▼
 Structural Validation (Minimum Field Integrity Check)
-  │
-  ▼
-Gemini Fallback Enrichment (Plaintext / Natural Language Only)
   │
   ▼
 Normalization Engine (Severity, Urgency, Certainty, Location, Datetime Mappers)
@@ -160,30 +144,7 @@ NormalizedAlert Records (Strict JSON Schema Output)
 1. **JSON (`json`)**: Structured alert feeds containing explicit field names or alias maps.
 2. **CAP XML (`cap_xml`)**: Common Alerting Protocol (CAP 1.2) XML feeds with standard element hierarchy.
 3. **RSS XML (`rss`)**: XML feeds containing `<item>` disaster notifications and geo/category metadata.
-4. **Plaintext (`plaintext`)**: Unstructured alert notifications parsed deterministically using regex extraction.
-5. **Natural Language (`process_natural_language`)**: Free-form user inputs packaged into `ParsedAlert` objects and processed through the core pipeline.
-
----
-
-## 💬 Natural Language Support
-
-Stage 12 introduces an optional **Natural Language Entry Layer** (`NaturalLanguageProcessor`) that sits above the pipeline:
-
-- Converts free-form text into `ParsedAlert(source="Natural Language Entry Layer", source_format="plaintext")`.
-- Reuses the core pipeline (`AlertPipeline.process_natural_language(text)`).
-- Zero duplicate Gemini code: uses the Stage 6 `GeminiExtractor` inside the pipeline for LLM-based field enrichment.
-- Preserves parser philosophy: missing values remain `None`, warnings are recorded, and no speculative fields are invented.
-
----
-
-## 🤖 Gemini Fallback Explanation
-
-Google Gemini API (`gemini-2.5-flash`) is used **strictly as a fallback enrichment engine** for incomplete plaintext alerts or natural language inputs.
-
-- **Deterministic First**: Structured formats (JSON, CAP, RSS) and deterministic regex plaintext extractions bypass Gemini entirely.
-- **Trigger**: Gemini is called ONLY if essential fields (`raw_hazard`, `raw_severity`, `raw_location`) are missing.
-- **Merge Policy**: Existing parser extractions take priority; Gemini ONLY populates missing fields.
-- **Resilience**: API key absence, rate limits (HTTP 429), or network timeouts append `parse_warnings` and gracefully proceed without breaking the batch.
+4. **Plaintext (`plaintext`)**: Standardized plaintext alert notifications parsed deterministically using regex extraction.
 
 ---
 
@@ -193,14 +154,14 @@ The project includes a modern, high-performance Streamlit presentation dashboard
 
 ### Key Features
 - **Zero Engine Modifications**: Client of the frozen `AlertPipeline`.
-- **Sample Datasets**: One-click sample loading for JSON, CAP XML, RSS XML, Plaintext, and Natural Language inputs.
+- **Sample Datasets**: One-click sample loading for JSON, CAP XML, RSS XML, and Plaintext inputs.
 - **Processing Time Metric**: Execution speed measured in milliseconds (`time.perf_counter()`).
 - **Real-Time Presentation Filters & Search**: Search by Alert ID, Location, or Hazard, with dropdown filters for Severity and Duplicate status.
 - **Dual Result Views**: Executive Cards (expanders with color-coded severity/duplicate badges) + Compact Data Table (sortable grid).
-- **Interactive Pipeline Flow Diagram**: Graphical pipeline visualizer highlighting the active source format and Gemini fallback stage.
+- **Interactive Pipeline Flow Diagram**: Graphical pipeline visualizer highlighting active stage execution.
 - **Raw JSON & One-Click Exports**: Instant Download JSON (`normalized_alerts.json`) and Download CSV (`normalized_alerts.csv`).
-- **Complete Demo Mode**: One-click "Run Complete Demo" processing all 5 input streams sequentially.
-- **Error Handling Panels**: User-friendly styled warning panels for invalid JSON, broken XML, or Gemini API limits without app crashes.
+- **Complete Demo Mode**: One-click "Run Complete Demo" processing all supported input streams sequentially.
+- **Error Handling Panels**: User-friendly styled warning panels for invalid JSON or broken XML payloads without app crashes.
 
 ### Launching the Dashboard Locally
 
@@ -234,21 +195,13 @@ Open `http://localhost:8501` in your browser.
 ![RSS Processing](assets/04_rss_processing.png)
 *Ingestion of RSS 2.0 XML feeds with automatic fallback mapping and graceful parse warning logging.*
 
-### Plaintext Processing
-![Plaintext Processing](assets/05_plaintext_processing.png)
-*Deterministic regex extraction of unstructured plaintext alert notifications with batch execution metrics.*
-
-### Natural Language Processing
-![Natural Language Processing](assets/06_natural_language_processing.png)
-*Targeted Google Gemini AI fallback enrichment converting free-form natural language prompts into normalized schema records.*
-
 ### Pipeline Visualization
 ![Pipeline Visualization](assets/07_pipeline_visualization.png)
-*Interactive visual execution flow diagram highlighting the 7-stage AlertPipeline architectural process.*
+*Interactive visual execution flow diagram highlighting the AlertPipeline architectural process.*
 
 ### About Page
 ![About Page](assets/08_about_page.png)
-*Comprehensive system specifications, technical stack breakdown, and implementation status across all 12 engine stages.*
+*Comprehensive system specifications, technical stack breakdown, and implementation status across all engine stages.*
 
 ---
 
@@ -260,13 +213,7 @@ The repository is configured for 1-click deployment on **Streamlit Community Clo
 1. Push this repository to GitHub.
 2. Sign in to [Streamlit Community Cloud](https://share.streamlit.io/).
 3. Click **New App** and select your repository, branch (`main`), and main file path (`app.py`).
-4. Under **Advanced settings** -> **Secrets**, add your optional Gemini API Key:
-   ```toml
-   GEMINI_API_KEY = "your_google_gemini_api_key_here"
-   ```
-5. Click **Deploy!**
-
-*For comprehensive step-by-step instructions and troubleshooting, see [DEPLOYMENT.md](DEPLOYMENT.md).*
+4. Click **Deploy!**
 
 ---
 
@@ -278,7 +225,7 @@ Run the interactive CLI demonstration showcase:
 .venv/bin/python demo.py
 ```
 
-This demonstrates processing across all supported formats (JSON, CAP XML, RSS XML, Plaintext, Natural Language) and outputs a sequential summary report:
+This demonstrates processing across all supported formats (JSON, CAP XML, RSS XML, Plaintext) and outputs a sequential summary report:
 
 ```
 JSON : 14
@@ -294,32 +241,12 @@ TOTAL DUPLICATES : 2
 
 ## 🧪 Running Tests
 
-Execute the complete test suite (123 test cases passing):
+Execute the complete test suite (130 test cases passing):
 
 ```bash
-# Run Stage 12 Natural Language unit tests
-.venv/bin/pytest tests/test_nlp_processor.py -v
-
 # Run complete system test suite
 .venv/bin/pytest -v
 ```
-
----
-
-## ⚙️ Environment Variables
-
-Copy `.env.example` to `.env` and set your optional Google Gemini API key:
-
-```bash
-cp .env.example .env
-```
-
-`.env` contents:
-```env
-GEMINI_API_KEY=your_google_gemini_api_key_here
-```
-
-*Note: If `GEMINI_API_KEY` is not provided, the pipeline continues using deterministic parsing and appends parse warnings when fallback is required.*
 
 ---
 
@@ -355,13 +282,12 @@ alert-intelligence-engine/
 │   ├── pipeline.py                   # AlertPipeline core orchestration engine
 │   ├── schema.py                     # Pydantic data models (ParsedAlert, NormalizedAlert)
 │   └── validator.py                  # Structural and Schema Validation engine
-├── tests/                            # Comprehensive Pytest test suites (123 tests)
+├── tests/                            # Comprehensive Pytest test suites (130 tests)
 ├── app.py                            # Streamlit Web Dashboard application
 ├── demo.py                           # CLI showcase script
 ├── DEPLOYMENT.md                     # Deployment guide for Streamlit Cloud
 ├── requirements.txt                  # Dependency declaration
-├── README.md                         # Project documentation
-└── .env.example                      # Environment configuration template
+└── README.md                         # Project documentation
 ```
 
 ---
@@ -372,7 +298,7 @@ The Alert Intelligence Engine strictly adheres to **Ponytail Engineering Princip
 
 - **YAGNI (You Aren't Gonna Need It)**: No speculative features, complex frameworks, or unnecessary abstraction layers.
 - **Standard Library First**: Core parsing relies on Python standard libraries (`xml.etree.ElementTree`, `json`, `re`, `datetime`).
-- **Deterministic First**: AI (Gemini) is used only as a targeted fallback for missing plaintext fields.
+- **Deterministic First**: High-performance regex and XML/JSON parsing ensures zero downtime, zero external API latency, and 100% deterministic output.
 - **Fault Tolerance**: Malformed input records never terminate batch processing; errors log warnings and continue execution.
 - **Immutability & Typing**: Pydantic v2 models guarantee strict schema constraints and immutability.
 
@@ -380,7 +306,6 @@ The Alert Intelligence Engine strictly adheres to **Ponytail Engineering Princip
 
 ## 📚 References
 
-- [Google Gemini API Documentation](https://ai.google.dev/docs)
 - [Common Alerting Protocol (CAP) Version 1.2 Specification](https://docs.oasis-open.org/emergency/cap/v1.2/CAP-v1.2-os.html)
 - [RSS 2.0 Specification](https://www.rssboard.org/rss-specification)
 - [Streamlit Documentation](https://docs.streamlit.io/)
