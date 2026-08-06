@@ -231,14 +231,37 @@ def render_filter_and_search_controls(alerts: List[NormalizedAlert]) -> List[Nor
     hazards = sorted(list(set(a.hazard_type for a in alerts)))
     severities = sorted(list(set(a.severity for a in alerts)))
 
+    hazard_options = ["All"] + hazards
+    severity_options = ["All"] + severities
+    dup_options = ["All", "Canonical Only", "Duplicates Only"]
+
+    if "filter_hazard" in st.session_state and st.session_state.filter_hazard not in hazard_options:
+        st.session_state.filter_hazard = "All"
+    if "filter_severity" in st.session_state and st.session_state.filter_severity not in severity_options:
+        st.session_state.filter_severity = "All"
+    if "filter_duplicate" in st.session_state and st.session_state.filter_duplicate not in dup_options:
+        st.session_state.filter_duplicate = "All"
+
     with col2:
-        selected_hazard = st.selectbox("Hazard Type", options=["All"] + hazards)
+        selected_hazard = st.selectbox(
+            "Hazard Type",
+            options=hazard_options,
+            key="filter_hazard",
+        )
 
     with col3:
-        selected_severity = st.selectbox("Severity Level", options=["All"] + severities)
+        selected_severity = st.selectbox(
+            "Severity Level",
+            options=severity_options,
+            key="filter_severity",
+        )
 
     with col4:
-        selected_dup = st.selectbox("Duplicate Status", options=["All", "Canonical Only", "Duplicates Only"])
+        selected_dup = st.selectbox(
+            "Duplicate Status",
+            options=dup_options,
+            key="filter_duplicate",
+        )
 
     filtered = list(alerts)
 

@@ -102,6 +102,10 @@ def main() -> None:
     # Process Action Handler
     if process_clicked:
         st.session_state.demo_summary = None
+        st.session_state.search_input = ""
+        st.session_state.filter_hazard = "All"
+        st.session_state.filter_severity = "All"
+        st.session_state.filter_duplicate = "All"
         input_payload: Any = None
 
         if input_method == "Load Sample Dataset":
@@ -131,6 +135,10 @@ def main() -> None:
 
     # Demo Mode Action Handler
     if demo_clicked:
+        st.session_state.search_input = ""
+        st.session_state.filter_hazard = "All"
+        st.session_state.filter_severity = "All"
+        st.session_state.filter_duplicate = "All"
         with st.spinner("Executing complete demo across all 5 engine formats..."):
             (
                 results_by_format,
@@ -186,16 +194,16 @@ def main() -> None:
     alerts = st.session_state.processed_alerts
 
     if alerts is not None:
-        # Render Metrics Bar
+        # Presentation Filters & Search
+        filtered_alerts = render_filter_and_search_controls(alerts)
+
+        # Render Metrics Bar from filtered_alerts
         render_summary_metrics(
-            alerts,
+            filtered_alerts,
             st.session_state.elapsed_ms,
             st.session_state.source_format_label,
         )
         st.markdown("<br>", unsafe_allow_html=True)
-
-        # Presentation Filters & Search
-        filtered_alerts = render_filter_and_search_controls(alerts)
 
         with tab_cards:
             render_results_cards(filtered_alerts)
@@ -204,7 +212,7 @@ def main() -> None:
             render_results_table(filtered_alerts)
 
         with tab_json:
-            render_raw_json_and_downloads(alerts)
+            render_raw_json_and_downloads(filtered_alerts)
 
         with tab_flow:
             render_pipeline_tab(st.session_state.active_format_key)
