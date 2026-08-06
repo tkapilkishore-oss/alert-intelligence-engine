@@ -433,8 +433,8 @@ def render_pipeline_tab(active_format: str) -> None:
         ("3. Structural Validation", "Validate minimum usable fields & structure", False),
         ("4. Normalization Engine", "Map Severity, Urgency, Certainty & Location IDs", False),
         ("5. Schema Validation", "Validate final Pydantic NormalizedAlert schema", False),
-        ("6. Deduplication Engine", "Weighted similarity scoring (Threshold ≥ 0.75)", False),
-        ("Output Deliverable", "normalized_alerts.json", False),
+        ("6. Batch Deduplication", "Weighted similarity scoring (Threshold ≥ 0.75)", False),
+        ("7. Normalized Alert Output", "normalized_alerts.json", False),
     ]
 
     for idx, (title, desc, is_active_fmt) in enumerate(steps):
