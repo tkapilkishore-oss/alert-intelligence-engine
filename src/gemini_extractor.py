@@ -20,6 +20,8 @@ DEFAULT_GEMINI_MODEL: str = "gemini-2.5-flash"
 ALLOWED_GEMINI_KEYS: Set[str] = {
     "raw_hazard",
     "raw_severity",
+    "raw_urgency",
+    "raw_certainty",
     "raw_location",
     "raw_start_time",
     "raw_end_time",
@@ -149,7 +151,7 @@ class GeminiExtractor:
         return not alert.raw_hazard or not alert.raw_severity or not alert.raw_location
 
     def _build_prompt(self, text: str) -> str:
-        """Build isolated prompt using PROMPT_VERSION.
+        """Build structured prompt using PROMPT_VERSION with few-shot examples.
 
         Args:
             text: Original alert raw text.
@@ -159,18 +161,38 @@ class GeminiExtractor:
         """
         return (
             f"You are a disaster alert information extraction engine (Prompt Version: {PROMPT_VERSION}).\n"
-            "Extract disaster information from the following text into JSON format.\n\n"
-            "Return a JSON object containing ONLY the following keys:\n"
-            "- raw_hazard: raw hazard or event description (or null if missing)\n"
-            "- raw_severity: raw severity or alert level keyword (or null if missing)\n"
-            "- raw_location: raw location or area mentioned (or null if missing)\n"
-            "- raw_start_time: raw start time or validity start text (or null if missing)\n"
-            "- raw_end_time: raw end time or validity end text (or null if missing)\n"
-            "- raw_action: raw recommended action or instruction (or null if missing)\n\n"
+            "Extract disaster information from the provided text into JSON format.\n\n"
+            "Return a JSON object containing EXACTLY the following 8 keys:\n"
+            "- raw_hazard: raw hazard or event category (e.g. 'flood warning', 'flash flood', 'cyclone', 'landslide', 'heatwave', 'lightning', 'earthquake'). Infer hazard type when strongly implied by wording (e.g. heavy rainfall or flood warning -> 'flood warning' or 'flood'; cyclone -> 'cyclone'; landslide -> 'landslide'; heatwave -> 'heatwave').\n"
+            "- raw_severity: raw severity or alert level keyword ('Extreme', 'Severe', 'Moderate', 'Minor', or null if unknown). Infer from tone or explicit terms (e.g. warning/flash flood/cyclone -> 'Severe' or 'Extreme'; watch/risk -> 'Moderate' or 'Severe').\n"
+            "- raw_urgency: raw urgency keyword ('Immediate', 'Expected', 'Future', 'Past', or null if unknown). Infer from temporal context or warning language (e.g. 'tonight' or 'flash flood' -> 'Immediate'; 'tomorrow' or 'warning' -> 'Expected'; 'this weekend' -> 'Expected' or 'Future').\n"
+            "- raw_certainty: raw certainty keyword ('Observed', 'Likely', 'Possible', or null if unknown). Infer from confidence tone (e.g. reported/occurring -> 'Observed'; warning/expected -> 'Likely'; risk/watch/potential -> 'Possible').\n"
+            "- raw_location: raw location or area name mentioned (e.g. 'Devapur', 'Chennai', 'Munnar', 'Mysore', 'Bengaluru') or null if missing.\n"
+            "- raw_start_time: raw start time or validity start text (e.g. 'tomorrow morning', 'tonight', 'this weekend') or null if missing.\n"
+            "- raw_end_time: raw end time or validity end text or null if missing.\n"
+            "- raw_action: raw recommended action or protective instruction sentence/clause (e.g. 'Residents should avoid flooded roads') or null if missing.\n\n"
+            "FEW-SHOT EXAMPLES:\n\n"
+            "Example 1 (Flood):\n"
+            'Input: "Heavy rainfall warning for Devapur tomorrow morning. Residents should avoid flooded roads."\n'
+            'Output: {"raw_hazard": "flood warning", "raw_severity": "Severe", "raw_urgency": "Expected", "raw_certainty": "Likely", "raw_location": "Devapur", "raw_start_time": "tomorrow morning", "raw_end_time": null, "raw_action": "Residents should avoid flooded roads"}\n\n'
+            "Example 2 (Cyclone):\n"
+            'Input: "Cyclone expected near Chennai tonight."\n'
+            'Output: {"raw_hazard": "cyclone", "raw_severity": "Severe", "raw_urgency": "Immediate", "raw_certainty": "Likely", "raw_location": "Chennai", "raw_start_time": "tonight", "raw_end_time": null, "raw_action": null}\n\n'
+            "Example 3 (Landslide):\n"
+            'Input: "Landslide risk in Munnar after continuous rainfall."\n'
+            'Output: {"raw_hazard": "landslide", "raw_severity": "Moderate", "raw_urgency": "Expected", "raw_certainty": "Possible", "raw_location": "Munnar", "raw_start_time": null, "raw_end_time": null, "raw_action": null}\n\n'
+            "Example 4 (Flash Flood):\n"
+            'Input: "Flash flood warning for Mysore."\n'
+            'Output: {"raw_hazard": "flash flood", "raw_severity": "Severe", "raw_urgency": "Immediate", "raw_certainty": "Likely", "raw_location": "Mysore", "raw_start_time": null, "raw_end_time": null, "raw_action": null}\n\n'
+            "Example 5 (Heatwave):\n"
+            'Input: "Heatwave warning for Bengaluru this weekend."\n'
+            'Output: {"raw_hazard": "heatwave", "raw_severity": "Severe", "raw_urgency": "Expected", "raw_certainty": "Likely", "raw_location": "Bengaluru", "raw_start_time": "this weekend", "raw_end_time": null, "raw_action": null}\n\n'
             "STRICT RULES:\n"
-            "1. Return STRICT JSON ONLY. No markdown, no prose explanations, no extra keys.\n"
-            "2. Do NOT add any keys other than the 6 keys listed above.\n"
-            "3. If a field cannot be identified, set its value to null.\n\n"
+            "1. Return STRICT JSON ONLY. No markdown wrapping (no ```json), no explanatory text.\n"
+            "2. Do NOT add any keys other than the 8 keys listed above.\n"
+            "3. Do NOT hallucinate or invent facts. Never fabricate alert IDs, timestamps, or administrative codes.\n"
+            "4. Prefer conservative semantic inference ONLY when strongly implied by plain English text.\n"
+            "5. If a field cannot be identified or inferred with confidence, set its value to null.\n\n"
             f"Input Text: {text}"
         )
 
@@ -181,6 +203,12 @@ class GeminiExtractor:
 
         if not alert.raw_severity and data.get("raw_severity"):
             alert.raw_severity = str(data["raw_severity"])
+
+        if not alert.raw_urgency and data.get("raw_urgency"):
+            alert.raw_urgency = str(data["raw_urgency"])
+
+        if not alert.raw_certainty and data.get("raw_certainty"):
+            alert.raw_certainty = str(data["raw_certainty"])
 
         if not alert.raw_location and data.get("raw_location"):
             alert.raw_location = str(data["raw_location"])
@@ -193,3 +221,4 @@ class GeminiExtractor:
 
         if not alert.raw_action and data.get("raw_action"):
             alert.raw_action = str(data["raw_action"])
+

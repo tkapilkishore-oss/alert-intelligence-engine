@@ -2,6 +2,7 @@
 
 from typing import Optional
 
+from src.gemini_extractor import GeminiExtractor
 from src.logger import get_logger
 from src.schema import ParsedAlert
 
@@ -11,6 +12,14 @@ logger = get_logger(__name__)
 class NaturalLanguageProcessor:
     """Processor converting free-form user natural language into structured ParsedAlert representation."""
 
+    def __init__(self, gemini_extractor: Optional[GeminiExtractor] = None) -> None:
+        """Initialize NaturalLanguageProcessor with optional GeminiExtractor.
+
+        Args:
+            gemini_extractor: Optional GeminiExtractor instance override.
+        """
+        self._gemini_extractor = gemini_extractor or GeminiExtractor()
+
     def process(self, text: str) -> ParsedAlert:
         """Convert free-form natural language text into a ParsedAlert for pipeline processing.
 
@@ -18,7 +27,7 @@ class NaturalLanguageProcessor:
             text: Free-form user disaster alert text.
 
         Returns:
-            ParsedAlert: Unnormalized intermediate alert representation with original text packaged in raw_payload.
+            ParsedAlert: Intermediate alert representation enriched by Gemini extraction.
         """
         warnings = []
         cleaned_text = ""
@@ -32,9 +41,15 @@ class NaturalLanguageProcessor:
                 warnings.append("Empty or whitespace natural language input text")
                 logger.warning("NaturalLanguageProcessor received empty/whitespace input.")
 
-        return ParsedAlert(
+        parsed = ParsedAlert(
             source="Natural Language Entry Layer",
             source_format="plaintext",
             raw_payload={"original_text": cleaned_text if isinstance(text, str) else str(text)},
             parse_warnings=warnings,
         )
+
+        if cleaned_text:
+            parsed = self._gemini_extractor.enrich(parsed)
+
+        return parsed
+
