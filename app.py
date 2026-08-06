@@ -43,8 +43,8 @@ st.markdown(MAIN_CSS, unsafe_allow_html=True)
 try:
     if hasattr(st, "secrets") and "GEMINI_API_KEY" in st.secrets:
         secret_key = st.secrets.get("GEMINI_API_KEY")
-        if secret_key and not os.getenv("GEMINI_API_KEY"):
-            os.environ["GEMINI_API_KEY"] = str(secret_key)
+        if secret_key:
+            os.environ["GEMINI_API_KEY"] = str(secret_key).strip()
 except Exception:
     # Secrets file or secrets dictionary not present in environment; safe fallback
     pass

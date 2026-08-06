@@ -50,7 +50,15 @@ class GeminiExtractor:
             model_name: Optional Gemini model identifier to query. Reads from GEMINI_MODEL if absent.
         """
         load_dotenv()
-        self._api_key = api_key if api_key is not None else os.getenv("GEMINI_API_KEY")
+        env_key = os.getenv("GEMINI_API_KEY")
+        if not env_key:
+            try:
+                import streamlit as st
+                if hasattr(st, "secrets") and "GEMINI_API_KEY" in st.secrets:
+                    env_key = str(st.secrets.get("GEMINI_API_KEY") or "").strip()
+            except Exception:
+                pass
+        self._api_key = api_key if api_key is not None else env_key
         env_model = os.getenv("GEMINI_MODEL")
         if model_name:
             self._model_name = model_name
