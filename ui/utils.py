@@ -86,8 +86,8 @@ def execute_pipeline(
                 return (
                     [],
                     0.0,
-                    "Invalid JSON Input",
-                    f"The uploaded/pasted input is not valid JSON.\nSyntax error: {str(exc)}",
+                    "Invalid JSON Content",
+                    f"Invalid JSON content. Please paste a valid JSON document.\nSyntax error: {str(exc)}",
                 )
 
         elif fmt_clean in ["cap_xml", "rss"]:

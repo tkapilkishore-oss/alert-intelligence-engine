@@ -44,40 +44,70 @@ def render_sidebar() -> Tuple[str, str, Any]:
     st.sidebar.markdown("### ⚙️ Engine Control Panel")
     st.sidebar.markdown("---")
 
-    # 1. Format Selection
-    format_options = {
-        "JSON": "json",
-        "CAP XML": "cap_xml",
-        "RSS XML": "rss",
-        "Plaintext": "plaintext",
-        "Natural Language": "natural_language",
-    }
-    selected_format_label = st.sidebar.selectbox(
-        "Select Input Source Format",
-        options=list(format_options.keys()),
-        index=0,
-        help="Choose the input alert format to send through the pipeline.",
-    )
-    source_format = format_options[selected_format_label]
-
-    # 2. Input Mode Selection
+    # Input Method Selection
     input_method = st.sidebar.radio(
         "Select Input Method",
-        options=["Load Sample Dataset", "Paste Text / Data", "Upload File"],
+        options=[
+            "Load Sample Dataset",
+            "Upload JSON Content",
+            "Plain Text",
+            "Upload File",
+        ],
         index=0,
     )
 
+    source_format = "json"
     raw_input_data: Any = None
 
     if input_method == "Load Sample Dataset":
-        st.sidebar.info(f"Loaded sample dataset for **{selected_format_label}**.")
-    elif input_method == "Paste Text / Data":
-        raw_input_data = st.sidebar.text_area(
-            "Paste Raw Alert Data / Prompt",
-            height=200,
-            placeholder=f"Paste {selected_format_label} content here...",
+        sample_format_options = {
+            "JSON": "json",
+            "CAP XML": "cap_xml",
+            "RSS XML": "rss",
+            "Plaintext": "plaintext",
+            "Natural Language": "natural_language",
+        }
+        selected_sample_label = st.sidebar.selectbox(
+            "Select Sample Dataset Format",
+            options=list(sample_format_options.keys()),
+            index=0,
+            help="Choose the sample format to load into the pipeline.",
         )
+        source_format = sample_format_options[selected_sample_label]
+        st.sidebar.info(f"Loaded sample dataset for **{selected_sample_label}**.")
+
+    elif input_method == "Upload JSON Content":
+        source_format = "json"
+        raw_input_data = st.sidebar.text_area(
+            "Paste Raw JSON Content",
+            height=200,
+            placeholder='Paste raw JSON document here...\n\nExample:\n{\n  "alert_id": "ALT-101",\n  "headline": "Severe Flood Warning",\n  ...\n}',
+            help="Strict JSON input only. Must be a valid JSON object or array.",
+        )
+
+    elif input_method == "Plain Text":
+        source_format = "natural_language"
+        raw_input_data = st.sidebar.text_area(
+            "Enter Plain Text / Emergency Prompt",
+            height=200,
+            placeholder="Type or paste natural English alert description here...\n\nExample:\nHeavy rainfall warning for Devapur from tomorrow morning. Residents should avoid flooded roads.",
+            help="Unrestricted natural English text input.",
+        )
+
     elif input_method == "Upload File":
+        file_format_options = {
+            "JSON": "json",
+            "CAP XML": "cap_xml",
+            "RSS XML": "rss",
+            "Plaintext": "plaintext",
+        }
+        selected_file_label = st.sidebar.selectbox(
+            "Select File Format",
+            options=list(file_format_options.keys()),
+            index=0,
+            help="Select the format of the file you are uploading.",
+        )
+        source_format = file_format_options[selected_file_label]
         uploaded_file = st.sidebar.file_uploader(
             "Upload Alert File",
             type=["json", "xml", "rss", "txt"],
@@ -88,7 +118,7 @@ def render_sidebar() -> Tuple[str, str, Any]:
                 try:
                     raw_input_data = json.loads(content)
                 except json.JSONDecodeError:
-                    raw_input_data = content  # let pipeline/utils catch error cleanly
+                    raw_input_data = content  # execute_pipeline catches error cleanly
             else:
                 raw_input_data = content
 
