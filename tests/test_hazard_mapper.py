@@ -1,5 +1,6 @@
 """Unit tests for HazardMapper."""
 
+# pyrefly: ignore [missing-import]
 import pytest
 from src.mappers.hazard_mapper import HazardMapper
 

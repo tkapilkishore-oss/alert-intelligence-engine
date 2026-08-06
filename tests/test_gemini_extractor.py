@@ -2,7 +2,9 @@
 
 import json
 from unittest.mock import MagicMock, patch
+# pyrefly: ignore [missing-import]
 import pytest
+# pyrefly: ignore [missing-import]
 from google.genai.errors import APIError
 
 from src.gemini_extractor import PROMPT_VERSION, GeminiExtractor
