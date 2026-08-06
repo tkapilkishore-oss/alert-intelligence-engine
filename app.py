@@ -4,6 +4,7 @@ Strict presentation layer over frozen engine stages 1-12.
 Exclusively calls AlertPipeline.process(...) and AlertPipeline.process_natural_language(...).
 """
 
+import os
 from typing import Any, Dict, List, Optional
 
 import streamlit as st

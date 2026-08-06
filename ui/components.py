@@ -355,7 +355,12 @@ def render_results_table(alerts: List[NormalizedAlert]) -> None:
         st.info("No alerts match the selected search or filter criteria.")
         return
 
-    data = [alert.model_dump() for alert in alerts]
+    data = []
+    for alert in alerts:
+        row = alert.model_dump()
+        row["parse_warnings"] = "; ".join(alert.parse_warnings) if alert.parse_warnings else "None"
+        data.append(row)
+
     df = pd.DataFrame(data)
 
     # Reorder columns for readability
@@ -368,6 +373,7 @@ def render_results_table(alerts: List[NormalizedAlert]) -> None:
         "location_name",
         "location_id",
         "is_duplicate",
+        "parse_warnings",
         "start_time",
         "end_time",
         "recommended_action",
@@ -381,6 +387,7 @@ def render_results_table(alerts: List[NormalizedAlert]) -> None:
         df,
         use_container_width=True,
         hide_index=True,
+        key="results_data_table",
     )
 
 
