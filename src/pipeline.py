@@ -42,7 +42,7 @@ class AlertPipeline:
         self._gemini_extractor = gemini_extractor or GeminiExtractor()
         self._normalization_engine = normalization_engine or NormalizationEngine()
         self._deduplication_engine = deduplication_engine or DeduplicationEngine()
-        self._nlp_processor = nlp_processor or NaturalLanguageProcessor()
+        self._nlp_processor = nlp_processor or NaturalLanguageProcessor(gemini_extractor=self._gemini_extractor)
         self._parsers: Dict[str, BaseParser] = {
             "json": JsonParser(),
             "cap_xml": CapParser(),
@@ -174,7 +174,13 @@ class AlertPipeline:
         Returns:
             List[ParsedAlert]: Enriched ParsedAlert records.
         """
-        return [self._gemini_extractor.enrich(alert) for alert in alerts]
+        enriched: List[ParsedAlert] = []
+        for alert in alerts:
+            if alert.raw_payload and alert.raw_payload.get("_nlp_processed"):
+                enriched.append(alert)
+            else:
+                enriched.append(self._gemini_extractor.enrich(alert))
+        return enriched
 
     def _normalize(self, alerts: List[ParsedAlert]) -> List[NormalizedAlert]:
         """Convert ParsedAlert records into NormalizedAlert objects.

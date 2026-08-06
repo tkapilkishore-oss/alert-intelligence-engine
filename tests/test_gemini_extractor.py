@@ -47,8 +47,8 @@ def sample_complete_alert() -> ParsedAlert:
 
 
 def test_prompt_version_constant():
-    """Verify PROMPT_VERSION constant is defined as 'v1'."""
-    assert PROMPT_VERSION == "v1"
+    """Verify PROMPT_VERSION constant is defined as 'v2'."""
+    assert PROMPT_VERSION == "v2"
 
 
 def test_gemini_skipped_when_unnecessary(sample_complete_alert):
@@ -255,3 +255,44 @@ def test_gemini_timeout_exception_handling(sample_incomplete_alert):
 
         enriched = extractor.enrich(sample_incomplete_alert)
         assert any("Request timed out" in w for w in enriched.parse_warnings)
+
+
+def test_gemini_client_initialization_with_api_key():
+    """Verify GeminiExtractor initializes genai.Client(api_key=...) with configured environment or key."""
+    aq_key = "AQ.TEST_DUMMY_KEY_FOR_UNIT_TESTING_12345"
+    ext_aq = GeminiExtractor(api_key=aq_key)
+    assert ext_aq._api_key == aq_key
+
+
+def test_sanitize_json_response_extra_data():
+    """Verify _sanitize_json_response recovers valid JSON when surrounded by extra data or markdown fences."""
+    extractor = GeminiExtractor(api_key="fake_key")
+    raw_with_extra = (
+        "Here is the result:\n"
+        '{"raw_hazard": "flood", "raw_severity": "Severe", "raw_urgency": "Expected", "raw_certainty": "Likely", "raw_location": "Devapur", "raw_start_time": null, "raw_end_time": null, "raw_action": "Residents should avoid flooded roads"}\n'
+        "Extra data: line 11 column 1 (char 271)"
+    )
+    sanitized = extractor._sanitize_json_response(raw_with_extra)
+    data = json.loads(sanitized)
+    assert data["raw_hazard"] == "flood"
+    assert data["raw_location"] == "Devapur"
+
+
+def test_sanitize_json_response_unclosed():
+    """Verify _sanitize_json_response repairs unclosed/truncated JSON objects missing trailing closing brace."""
+    extractor = GeminiExtractor(api_key="fake_key")
+    raw_unclosed = (
+        "{\n"
+        '  "raw_hazard": "flood warning",\n'
+        '  "raw_severity": "Severe",\n'
+        '  "raw_urgency": "Expected",\n'
+        '  "raw_certainty": "Likely",\n'
+        '  "raw_location": "Devapur",\n'
+        '  "raw_start_time": "tomorrow morning",\n'
+        '  "raw_end_time": null,\n'
+        '  "raw_action": "Residents should avoid flooded roads"'
+    )
+    sanitized = extractor._sanitize_json_response(raw_unclosed)
+    data = json.loads(sanitized)
+    assert data["raw_hazard"] == "flood warning"
+    assert data["raw_location"] == "Devapur"

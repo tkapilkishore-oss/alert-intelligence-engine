@@ -21,7 +21,7 @@ def test_natural_language_conversion():
         assert isinstance(alert, ParsedAlert)
         assert alert.source == "Natural Language Entry Layer"
         assert alert.source_format == "plaintext"
-        assert alert.raw_payload == {"original_text": text}
+        assert alert.raw_payload == {"original_text": text, "_nlp_processed": True}
         assert alert.parse_warnings == []
 
 

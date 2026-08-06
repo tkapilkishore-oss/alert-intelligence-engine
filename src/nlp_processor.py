@@ -51,5 +51,6 @@ class NaturalLanguageProcessor:
         if cleaned_text:
             parsed = self._gemini_extractor.enrich(parsed)
 
+        parsed.raw_payload["_nlp_processed"] = True
         return parsed
 
