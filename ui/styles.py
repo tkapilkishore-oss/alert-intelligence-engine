@@ -144,11 +144,6 @@ h1, h2, h3, h4 {
     background: rgba(56, 189, 248, 0.1);
     box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
 }
-.pipeline-step-box.active-gemini {
-    border-color: #F43F5E;
-    background: rgba(244, 63, 94, 0.1);
-    box-shadow: 0 0 10px rgba(244, 63, 94, 0.2);
-}
 
 /* Error Panel */
 .error-panel {

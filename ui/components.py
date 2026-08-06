@@ -420,24 +420,20 @@ def render_pipeline_tab(active_format: str) -> None:
     """Render graphical representation of pipeline flow using Streamlit container boxes.
 
     Args:
-        active_format: Currently selected source format ("json", "cap_xml", "rss", "plaintext", "natural_language").
+        active_format: Currently selected source format ("json", "cap_xml", "rss", "plaintext").
     """
     st.markdown("### 🔄 Engine Pipeline Execution Flow")
     st.markdown(
-        "Below is the exact 7-stage architectural workflow executed by `AlertPipeline`."
+        "Below is the exact 6-stage architectural workflow executed by `AlertPipeline`."
     )
-
-    fmt_clean = (active_format or "json").lower().strip()
-    is_gemini_active = fmt_clean in ["plaintext", "natural_language"]
 
     steps = [
         ("1. Input Ingestion", f"Format Stream: {active_format.upper()}", False),
         ("2. Format Parser Router", f"Target Parser: {active_format.upper()} Parser", True),
         ("3. Structural Validation", "Validate minimum usable fields & structure", False),
-        ("4. Gemini Fallback Engine", "AI Enrichment (Plaintext / Incomplete inputs)", is_gemini_active),
-        ("5. Normalization Engine", "Map Severity, Urgency, Certainty & Location IDs", False),
-        ("6. Schema Validation", "Validate final Pydantic NormalizedAlert schema", False),
-        ("7. Deduplication Engine", "Weighted similarity scoring (Threshold ≥ 0.75)", False),
+        ("4. Normalization Engine", "Map Severity, Urgency, Certainty & Location IDs", False),
+        ("5. Schema Validation", "Validate final Pydantic NormalizedAlert schema", False),
+        ("6. Deduplication Engine", "Weighted similarity scoring (Threshold ≥ 0.75)", False),
         ("Output Deliverable", "normalized_alerts.json", False),
     ]
 
@@ -445,8 +441,6 @@ def render_pipeline_tab(active_format: str) -> None:
         box_class = "pipeline-step-box"
         if is_active_fmt:
             box_class += " active-format"
-        elif "Gemini" in title and is_gemini_active:
-            box_class += " active-gemini"
 
         st.markdown(
             f"""
@@ -475,10 +469,9 @@ def render_about_tab() -> None:
         #### 🏛️ System Architecture Summary
         The Alert Intelligence Engine is a high-performance disaster alert normalization system designed for Emergency Operations Centers (EOCs) and public safety platforms.
         
-        - **Pipeline Pattern:** Sequential 7-stage processing pipeline.
-        - **Deterministic First:** 100% deterministic parsing and rule-based normalization.
-        - **AI Fallback:** Google Gemini API utilized strictly as a fallback for incomplete plaintext extraction.
-        - **Deduplication:** Multi-factor weighted score (35% Hazard, 30% Location, 20% Time, 15% Text).
+        - **Pipeline Pattern:** Sequential 6-stage processing pipeline.
+        - **Deterministic Engine:** 100% deterministic parsing and rule-based normalization.
+        - **Deduplication:** Multi-factor weighted score (40% Hazard, 40% Location, 20% Time).
         """
         )
 
@@ -488,16 +481,15 @@ def render_about_tab() -> None:
         #### 🧰 Technical Stack
         - **Core Language:** Python 3.11+ / 3.14
         - **Data Validation:** Pydantic v2
-        - **XML & Feeds:** `lxml`, `feedparser`
+        - **XML & Feeds:** Standard library `xml.etree.ElementTree`
         - **Data & Matching:** `pandas`, `RapidFuzz`
-        - **AI Fallback:** Google Gemini API (`google-genai`)
-        - **Testing:** `pytest` (123 test cases passing)
+        - **Testing:** `pytest` (130 test cases passing)
         - **UI Client:** Streamlit Presentation Layer
         """
         )
 
     st.markdown("---")
-    st.markdown("#### 🚀 Implemented Stages (Stages 1–12 Complete & Frozen)")
+    st.markdown("#### 🚀 Implemented Engine Stages")
 
     stages_data = [
         {"Stage": "Stage 1", "Module": "Project Foundation & Schemas", "Status": "FROZEN"},
@@ -505,13 +497,12 @@ def render_about_tab() -> None:
         {"Stage": "Stage 3", "Module": "CAP XML Parser", "Status": "FROZEN"},
         {"Stage": "Stage 4", "Module": "RSS XML Parser", "Status": "FROZEN"},
         {"Stage": "Stage 5", "Module": "Plaintext Parser", "Status": "FROZEN"},
-        {"Stage": "Stage 6", "Module": "Gemini Fallback Engine", "Status": "FROZEN"},
         {"Stage": "Stage 7", "Module": "Normalization Engine & Mappers", "Status": "FROZEN"},
         {"Stage": "Stage 8", "Module": "Validation Engine", "Status": "FROZEN"},
         {"Stage": "Stage 9", "Module": "Deduplication Engine", "Status": "FROZEN"},
         {"Stage": "Stage 10", "Module": "Pipeline Orchestration Engine", "Status": "FROZEN"},
         {"Stage": "Stage 11", "Module": "End-to-End Verification Suite", "Status": "FROZEN"},
-        {"Stage": "Stage 12", "Module": "NLP Entry Layer & Release v1.0.0", "Status": "RELEASED"},
+        {"Stage": "Stage 12", "Module": "Release v1.0.0 Presentation Layer", "Status": "RELEASED"},
     ]
     st.table(pd.DataFrame(stages_data))
 
@@ -529,7 +520,7 @@ def render_empty_state() -> None:
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
             <div style="background: rgba(255,255,255,0.03); border: 1px solid #334155; padding: 16px; border-radius: 8px;">
                 <h4 style="color: #38BDF8; margin-bottom: 6px;">1. Select Input Stream</h4>
-                <p style="font-size: 0.85rem; color: #CBD5E1;">Choose JSON, CAP XML, RSS XML, Plaintext, or Natural Language prompt.</p>
+                <p style="font-size: 0.85rem; color: #CBD5E1;">Choose JSON, CAP XML, RSS XML, or Plaintext dataset.</p>
             </div>
             <div style="background: rgba(255,255,255,0.03); border: 1px solid #334155; padding: 16px; border-radius: 8px;">
                 <h4 style="color: #34D399; margin-bottom: 6px;">2. Load Sample or Paste</h4>
