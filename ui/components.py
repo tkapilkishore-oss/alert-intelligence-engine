@@ -25,7 +25,7 @@ def render_hero_header() -> None:
         <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
             <span class="status-pill">● Engine Status: READY</span>
             <span class="badge badge-format">Pipeline Version: v1.0.0</span>
-            <span class="badge badge-canonical">Supported Formats: JSON | CAP XML | RSS | Plaintext | Natural Language</span>
+            <span class="badge badge-canonical">Supported Formats: JSON | CAP XML | RSS | Plaintext</span>
             <span class="badge badge-minor">Tests: 123 Passed</span>
             <span class="badge badge-moderate">Architecture: 12 Frozen Stages</span>
         </div>
@@ -50,7 +50,6 @@ def render_sidebar() -> Tuple[str, str, Any]:
         options=[
             "Load Sample Dataset",
             "Upload JSON Content",
-            "Plain Text",
             "Upload File",
         ],
         index=0,
@@ -65,7 +64,6 @@ def render_sidebar() -> Tuple[str, str, Any]:
             "CAP XML": "cap_xml",
             "RSS XML": "rss",
             "Plaintext": "plaintext",
-            "Natural Language": "natural_language",
         }
         selected_sample_label = st.sidebar.selectbox(
             "Select Sample Dataset Format",
@@ -83,15 +81,6 @@ def render_sidebar() -> Tuple[str, str, Any]:
             height=200,
             placeholder='Paste raw JSON document here...\n\nExample:\n{\n  "alert_id": "ALT-101",\n  "headline": "Severe Flood Warning",\n  ...\n}',
             help="Strict JSON input only. Must be a valid JSON object or array.",
-        )
-
-    elif input_method == "Plain Text":
-        source_format = "natural_language"
-        raw_input_data = st.sidebar.text_area(
-            "Enter Plain Text / Emergency Prompt",
-            height=200,
-            placeholder="Type or paste natural English alert description here...\n\nExample:\nHeavy rainfall warning for Devapur from tomorrow morning. Residents should avoid flooded roads.",
-            help="Unrestricted natural English text input.",
         )
 
     elif input_method == "Upload File":

@@ -91,7 +91,6 @@ def main() -> None:
         "cap_xml": "CAP XML",
         "rss": "RSS XML",
         "plaintext": "Plaintext",
-        "natural_language": "Natural Language",
     }
     current_label = format_labels.get(source_format_key, source_format_key.upper())
 
@@ -170,7 +169,7 @@ def main() -> None:
     # Render Error Panels (if any)
     if st.session_state.error_info:
         err_title, err_msg = st.session_state.error_info
-        render_error_panel(err_title, err_msg)
+        render_error_panel(str(err_title), str(err_msg))
 
     # Render Demo Showcase Banner (if active)
     if st.session_state.demo_summary:
